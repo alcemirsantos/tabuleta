@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test2FeatureMapper
+Bundle-SymbolicName: br.ufmg.dcc.t2fm; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: br.ufmg.dcc.t2fm.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ ca.mcgill.cs.serg.cm;bundle-version="2.0.3",
+ com.mountainminds.eclemma.core;bundle-version="2.1.2",
+ com.mountainminds.eclemma.ui;bundle-version="2.1.2"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
