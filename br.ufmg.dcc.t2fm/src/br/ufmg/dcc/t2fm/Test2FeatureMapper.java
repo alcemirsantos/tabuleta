@@ -17,19 +17,18 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import ca.mcgill.cs.serg.cm.actions.LoadConcernModelAction;
-import ca.mcgill.cs.serg.cm.actions.SaveAction;
-import ca.mcgill.cs.serg.cm.model.ConcernModel;
-import ca.mcgill.cs.serg.cm.model.ConcernModelChangeListener;
-import ca.mcgill.cs.serg.cm.ui.ConcernMapperPreferencePage;
-import ca.mcgill.cs.serg.cm.ui.ProblemManager;
+import br.ufmg.dcc.t2fm.actions.LoadConcernModelAction;
+import br.ufmg.dcc.t2fm.actions.SaveAction;
+import br.ufmg.dcc.t2fm.model.ConcernModel;
+import br.ufmg.dcc.t2fm.model.ConcernModelChangeListener;
+import br.ufmg.dcc.t2fm.ui.ConcernMapperPreferencePage;
+import br.ufmg.dcc.t2fm.ui.ProblemManager;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -37,13 +36,12 @@ import ca.mcgill.cs.serg.cm.ui.ProblemManager;
 public class Test2FeatureMapper extends AbstractUIPlugin implements ConcernModelChangeListener{
 
 	/** An ID for the plugin (same as in the plugin.xml file). */
-	public static final String PLUGIN_ID = "br.ufmg.dcc.t2fm"; //$NON-NLS-1$
-
+	public static final String ID_PLUGIN = "br.ufmg.dcc.t2fm"; //$NON-NLS-1$
 	/**	 An ID for the view same as in the plugin.xml file). */
-	public static final String ID_VIEW = "ca.mcgill.cs.serg.cm.views.ConcernMapper";
+	public static final String ID_VIEW = "br.ufmg.dcc.t2fm.views.MapView";
 
-	// The shared instance
-	private static Test2FeatureMapper thisPlugin;
+	// The shared instance.
+	private static Test2FeatureMapper aPlugin;
 	
 	//Resource bundle.
 	private ResourceBundle aResourceBundle;
@@ -56,117 +54,28 @@ public class Test2FeatureMapper extends AbstractUIPlugin implements ConcernModel
 	
 	// A flag indicating that the data in the model is unsaved.
 	private boolean aDirty = false;
-
+	
 	/**
-	 * The constructor
+	 * The constructor.  Loads the resource bundle.
 	 */
-	public Test2FeatureMapper() {
-		thisPlugin = this;
+	public Test2FeatureMapper() 
+	{
+		aPlugin = this;
 		aModel = new ConcernModel();
-		try {
-			aResourceBundle = ResourceBundle.getBundle("br.ufmg.dcc.t2fm.Test2FeatureMapperResources");
-		} catch (MissingResourceException lException) {
+		try 
+		{
+			aResourceBundle = ResourceBundle.getBundle( "br.ufmg.dcc.t2fm.Test2FeatureMapperResources" );
+		}
+		catch( MissingResourceException lException )
+		{
 			aResourceBundle = null;
 		}
-		aModel.addListener(thisPlugin);
-		PlatformUI.getWorkbench().addWindowListener(new ConcernMapperWindowListener());
-		JavaCore.addElementChangedListener(new ConcernMapperElementChangedListener());
-	}
+		aModel.addListener( this );
+		PlatformUI.getWorkbench().addWindowListener( new ConcernMapperWindowListener() );
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		thisPlugin = this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-		thisPlugin = null;
-		super.stop(context);
-	}
-
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static Test2FeatureMapper getDefault() {
-		return thisPlugin;
-	}
-
-	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path
-	 *
-	 * @param path the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-
-	/**
-	 * @return The concern model associated with the plugin
-	 */
-	public ConcernModel getConcernModel(){
-		return aModel;
+		JavaCore.addElementChangedListener( new ConcernMapperElementChangedListener() );
 	}
 	
-	/**
-	 * Returns the resource where the model is stored by default.
-	 * @return A file handle.  Can be null.
-	 */
-	public IFile getDefaultResource()
-	{
-		return aFile;
-	}
-	
-	/**
-	 * Indicates whether the model contains unsaved information.
-	 * @return True if the model contains unsaved data.
-	 */
-	public boolean isDirty()
-	{
-		return aDirty;
-	}
-	
-	/**
-	 * Resets the dirty flag, thus signifying that the model
-	 * does not contain unsaved data.
-	 */
-	public void resetDirty()
-	{
-		aDirty = false;
-	}
-	
-	/**
-	 * Sets the resource where the concern model will be saved by default.
-	 * @param pFile The default resource.
-	 */
-	public void setDefaultResource( IFile pFile )
-	{
-		aFile = pFile;
-	}
-	
-	/**
-	 * When the model has changed we must reset the dirty bit.
-	 * @see ca.mcgill.cs.serg.cm.model.ConcernModelChangeListener#modelChanged()
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void modelChanged(int pChange) {
-		if( pChange != ConcernModel.CLEAR_VIEW )
-		{
-			aDirty = true;
-		}
-	}
-
 	/**
 	 * This class responds to ElementChanged events by determining if the event applies to an 
 	 * element in the model, or a parent (which would become consistent or not), and fires a model
@@ -317,4 +226,124 @@ public class Test2FeatureMapper extends AbstractUIPlugin implements ConcernModel
 		
 	}
 
+	
+	/**
+	 * Returns the resource where the model is stored by default.
+	 * @return A file handle.  Can be null.
+	 */
+	public IFile getDefaultResource()
+	{
+		return aFile;
+	}
+	
+	/**
+	 * Indicates whether the model contains unsaved information.
+	 * @return True if the model contains unsaved data.
+	 */
+	public boolean isDirty()
+	{
+		return aDirty;
+	}
+	
+	/**
+	 * Resets the dirty flag, thus signifying that the model
+	 * does not contain unsaved data.
+	 */
+	public void resetDirty()
+	{
+		aDirty = false;
+	}
+	
+	/**
+	 * Sets the resource where the concern model will be saved by default.
+	 * @param pFile The default resource.
+	 */
+	public void setDefaultResource( IFile pFile )
+	{
+		aFile = pFile;
+	}
+	
+	/**
+	 * @return The concern model associated with the plugin
+	 */
+	public ConcernModel getConcernModel()
+	{
+		return aModel;
+	}
+	
+	/** 
+	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+	 * @param pContext The context
+	 * @throws Exception If something happens
+	 */
+	public void start( BundleContext pContext ) throws Exception
+	{
+		super.start( pContext );
+	}
+	
+	/**
+	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	 * @param pContext the parameter
+	 * @throws Exception the exception
+	 */
+	public void stop( BundleContext pContext ) throws Exception 
+	{
+		super.stop( pContext );
+	}
+	
+	/**
+	 * Returns the shared instance.
+	 * @return The shared instance.
+	 */
+	public static Test2FeatureMapper getDefault()
+	{
+		return aPlugin;
+	}
+	
+	/**
+	 * Returns the string from the plugin's resource bundle,
+	 * or 'key' if not found.
+	 * @param pKey The key to use for the property lookup
+	 * @return A string representing the resource.
+	 */
+	public static String getResourceString( String pKey )
+	{
+		final ResourceBundle lBundle = Test2FeatureMapper.getDefault().getResourceBundle();
+		try 
+		{
+			if( lBundle != null )
+			{
+				return lBundle.getString( pKey );
+			}
+			else
+			{
+				return pKey;
+			}
+		}
+		catch( MissingResourceException lException )
+		{
+			return pKey;
+		}
+	}
+	
+	/**
+	 * @return The plugin's resource bundle
+	 */
+	public ResourceBundle getResourceBundle()
+	{
+		return aResourceBundle;
+	}
+	
+	/**
+	 * When the model has changed we must reset the dirty bit.
+	 * @see ca.mcgill.cs.serg.cm.model.ConcernModelChangeListener#modelChanged()
+	 * {@inheritDoc}
+	 */
+	public void modelChanged( int pChange ) 
+	{
+		if( pChange != ConcernModel.CLEAR_VIEW )
+		{
+			aDirty = true;
+		}
+	}
 }
