@@ -617,48 +617,6 @@ public class MapView extends ViewPart implements ConcernModelChangeListener, IPr
 		}
 		
 		
-		/**
-		 * Fills the context menu based on the type of selection.
-		 * @param pManager
-		 */
-		private void fillContextMenu( IMenuManager pManager )
-		{
-			ISelection lSelection = aViewer.getSelection();
-			if( lSelection instanceof IStructuredSelection )
-			{
-				IStructuredSelection lStructuredSelection = (IStructuredSelection)lSelection;
-				if( lStructuredSelection.size() == 1 )
-				{
-					Object lNext = lStructuredSelection.iterator().next();
-					if( lNext instanceof ConcernNode )
-					{
-						pManager.add( new RenameConcernAction( this, ((ConcernNode)lNext).getConcernName() ));
-						// TODO add run tests with eclemma
-						pManager.add( new RunAllAction());
-						pManager.add(new CoverageAsAction());
-					}
-					else
-					{
-						// We provide the context menu for searching
-						if( lNext instanceof JavaElementNode )
-						{
-							IJavaElement lElement = ((JavaElementNode)lNext).getElement();
-							if( lElement.exists() )
-							{
-								aJavaSearchActions.setContext( new ActionContext( new StructuredSelection( lElement )));
-								GroupMarker lSearchGroup = new GroupMarker("group.search");
-								pManager.add( lSearchGroup );
-								aJavaSearchActions.fillContextMenu( pManager );
-								aJavaSearchActions.setContext( null );
-								pManager.remove( lSearchGroup );
-							}
-						}
-					}
-				}
-				pManager.add( getDeleteActionFromSelection( lStructuredSelection ));
-			}
-			pManager.add( new Separator( IWorkbenchActionConstants.MB_ADDITIONS ));
-		}
 		
 		/*
 		 * Takes a selection and extracts all the elements that should be deleted. Extracts the elements 
@@ -702,6 +660,49 @@ public class MapView extends ViewPart implements ConcernModelChangeListener, IPr
 			pManager.add( new NewConcernAction( this ));
 			pManager.add( new Separator() );
 			pManager.add( new CollapseAllAction( this ));
+		}
+		
+		/**
+		 * Fills the context menu based on the type of selection.
+		 * @param pManager
+		 */
+		private void fillContextMenu( IMenuManager pManager )
+		{
+			ISelection lSelection = aViewer.getSelection();
+			if( lSelection instanceof IStructuredSelection )
+			{
+				IStructuredSelection lStructuredSelection = (IStructuredSelection)lSelection;
+				if( lStructuredSelection.size() == 1 )
+				{
+					Object lNext = lStructuredSelection.iterator().next();
+					if( lNext instanceof ConcernNode )
+					{
+						pManager.add( new RenameConcernAction( this, ((ConcernNode)lNext).getConcernName() ));
+						// TODO add run tests with eclemma
+						pManager.add( new RunAllAction());
+						pManager.add(new CoverageAsAction());
+					}
+					else
+					{
+						// We provide the context menu for searching
+						if( lNext instanceof JavaElementNode )
+						{
+							IJavaElement lElement = ((JavaElementNode)lNext).getElement();
+							if( lElement.exists() )
+							{
+								aJavaSearchActions.setContext( new ActionContext( new StructuredSelection( lElement )));
+								GroupMarker lSearchGroup = new GroupMarker("group.search");
+								pManager.add( lSearchGroup );
+								aJavaSearchActions.fillContextMenu( pManager );
+								aJavaSearchActions.setContext( null );
+								pManager.remove( lSearchGroup );
+							}
+						}
+					}
+				}
+				pManager.add( getDeleteActionFromSelection( lStructuredSelection ));
+			}
+			pManager.add( new Separator( IWorkbenchActionConstants.MB_ADDITIONS ));
 		}
 		
 		/**

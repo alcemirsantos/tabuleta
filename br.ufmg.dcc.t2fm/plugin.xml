@@ -21,18 +21,12 @@
       <perspectiveExtension
             targetID="org.eclipse.jdt.ui.JavaPerspective">
          <view
-               ratio="0.5"
-               relative="org.eclipse.ui.views.TaskList"
-               relationship="right"
+               ratio="0.7"
+               relative="org.eclipse.jdt.ui.PackageExplorer"
+               relationship="bottom"
                id="br.ufmg.dcc.t2fm.views.MapView">
          </view>
       </perspectiveExtension>
-   </extension>
-   <extension
-         point="org.eclipse.help.contexts">
-      <contexts
-            file="contexts.xml">
-      </contexts>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
@@ -53,21 +47,53 @@
             objectClass="br.ufmg.dcc.t2fm.actions.AddToConcernAction">
          <action
                class="br.ufmg.dcc.t2fm.actions.AddToConcernAction"
+               icon="icons/sample.gif"
                id="br.ufmg.dcc.t2fm.addToFeatureAction"
                label="Add to Feature"
                style="pulldown">
          </action>
       </objectContribution>
       <viewerContribution
-            id="br.ufmg.dcc.t2fm.addToConcernEditorContribution"
+            id="br.ufmg.dcc.t2fm.addToFeatureEditorContribution"
             targetID="org.eclipse.jdt.ui.CompilationUnitEditor.EditorContext">
          <action
                class="br.ufmg.dcc.t2fm.actions.AddToConcernAction"
-               id="br.ufmg.dcc.t2fm.addToConcernEditorAction"
+               id="br.ufmg.dcc.t2fm.addToFeatureEditorAction"
                label="Add to Feature"
                menubarPath="additions"
                style="pulldown"/>
       </viewerContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+         	id="br.ufmg.dcc.t2fm.decorator"
+         	label="Concern Mapper Decorator"
+         	class="br.ufmg.dcc.t2fm.decorators.LightWeightDecorator"
+         	adaptable="false"
+         	state="true"
+         	lightweight="true"
+         	location="BOTTOM_RIGHT">
+         <description>
+         	ConcernMapper decorator displays elements belonging to the concern model in bold and adds the name of the concerns it belongs to as a suffix. Parents of concern elements can also be decorated (see the Preferences Page).
+         </description>
+         <enablement>
+         	<objectClass name="java.lang.Object"/>
+         </enablement>
+      </decorator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            name="Test2Feature Mapper"
+            class="br.ufmg.dcc.t2fm.ui.ConcernMapperPreferencePage"
+            id="br.ufmg.dcc.t2fm.ConcernMapperPreferencePage">
+      </page>
+   </extension>
+   <extension 
+   		point="org.eclipse.core.runtime.preferences">
+	  <initializer 
+	  	class="ca.mcgill.cs.serg.cm.ConcernMapperPreferenceInitializer"/>
    </extension>
 
 </plugin>
