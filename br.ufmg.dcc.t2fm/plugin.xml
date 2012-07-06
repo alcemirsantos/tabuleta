@@ -34,5 +34,40 @@
             file="contexts.xml">
       </contexts>
    </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            objectClass="org.eclipse.core.resources.IFile"
+            nameFilter="*.cm"
+            id="br.ufmg.dcc.t2fm.cm.popup">
+         <action
+               enablesFor="1"
+               label="Load Features"
+               class="br.ufmg.dcc.t2fm.actions.LoadConcernModelAction"
+               menubarPath="group.cm"
+               id="br.ufmg.dcc.t2fm.actions.LoadConcernModelAction"/>
+      </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="br.ufmg.dcc.t2fm.addToFeatureObjectContribution"
+            objectClass="br.ufmg.dcc.t2fm.actions.AddToConcernAction">
+         <action
+               class="br.ufmg.dcc.t2fm.actions.AddToConcernAction"
+               id="br.ufmg.dcc.t2fm.addToFeatureAction"
+               label="Add to Feature"
+               style="pulldown">
+         </action>
+      </objectContribution>
+      <viewerContribution
+            id="br.ufmg.dcc.t2fm.addToConcernEditorContribution"
+            targetID="org.eclipse.jdt.ui.CompilationUnitEditor.EditorContext">
+         <action
+               class="br.ufmg.dcc.t2fm.actions.AddToConcernAction"
+               id="br.ufmg.dcc.t2fm.addToConcernEditorAction"
+               label="Add to Feature"
+               menubarPath="additions"
+               style="pulldown"/>
+      </viewerContribution>
+   </extension>
 
 </plugin>

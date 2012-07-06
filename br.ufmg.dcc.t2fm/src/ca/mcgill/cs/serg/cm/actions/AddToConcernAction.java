@@ -8,7 +8,7 @@
  * $Revision: 1.10 $
  */
 
-package br.ufmg.dcc.t2fm.actions;
+package ca.mcgill.cs.serg.cm.actions;
 
 import java.text.Collator;
 import java.util.Arrays;
@@ -40,10 +40,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 
-import br.ufmg.dcc.t2fm.Test2FeatureMapper;
-import br.ufmg.dcc.t2fm.model.ConcernModelChangeListener;
-import br.ufmg.dcc.t2fm.ui.ProblemManager;
-import br.ufmg.dcc.t2fm.views.MapView;
+import ca.mcgill.cs.serg.cm.ConcernMapper;
+import ca.mcgill.cs.serg.cm.model.ConcernModelChangeListener;
+import ca.mcgill.cs.serg.cm.ui.ProblemManager;
+import ca.mcgill.cs.serg.cm.views.ConcernMapperView;
 
 /**
  * Generates the menu and corresponding actions required to add an element to
@@ -51,7 +51,7 @@ import br.ufmg.dcc.t2fm.views.MapView;
  */
 public class AddToConcernAction implements IObjectActionDelegate, IEditorActionDelegate, IMenuCreator, ConcernModelChangeListener
 {
-	private static final String DEFAULT_CONCERN_NAME = "New Feature";
+	private static final String DEFAULT_CONCERN_NAME = "New Concern";
 	private static final int MAX_DEGREE = 100;
 
 	private ISelection aSelection;
@@ -64,7 +64,7 @@ public class AddToConcernAction implements IObjectActionDelegate, IEditorActionD
 	 */
 	public AddToConcernAction()
 	{
-		Test2FeatureMapper.getDefault().getConcernModel().addListener( this );
+		ConcernMapper.getDefault().getConcernModel().addListener( this );
 	}
 
 	/** 
@@ -112,7 +112,7 @@ public class AddToConcernAction implements IObjectActionDelegate, IEditorActionD
 	 */
 	public void dispose()
 	{
-		Test2FeatureMapper.getDefault().getConcernModel().removeListener( this );
+		ConcernMapper.getDefault().getConcernModel().removeListener( this );
 		for( MenuItem lItem : aMenu.getItems() )
 		{
 			lItem.dispose();
@@ -157,7 +157,7 @@ public class AddToConcernAction implements IObjectActionDelegate, IEditorActionD
 		}
 		
 		// Add an item for each concern in the model
-		String[] lConcerns = Test2FeatureMapper.getDefault().getConcernModel().getConcernNames();
+		String[] lConcerns = ConcernMapper.getDefault().getConcernModel().getConcernNames();
 		Arrays.sort( lConcerns, Collator.getInstance() );
 		for( String lConcern : lConcerns )
 		{
@@ -176,7 +176,7 @@ public class AddToConcernAction implements IObjectActionDelegate, IEditorActionD
 		// Add the New Concern item
 		MenuItem lNewConcernItem = new MenuItem( aMenu, SWT.PUSH );
 		lNewConcernItem.addSelectionListener( new AddToConcernMenuItemListener() );
-		if( !Test2FeatureMapper.getDefault().getConcernModel().exists( DEFAULT_CONCERN_NAME ) )
+		if( !ConcernMapper.getDefault().getConcernModel().exists( DEFAULT_CONCERN_NAME ) )
 		{
 			lNewConcernItem.setText( DEFAULT_CONCERN_NAME );
 		}
@@ -184,7 +184,7 @@ public class AddToConcernAction implements IObjectActionDelegate, IEditorActionD
 		{
 			for( int lIndex = 2;; lIndex++ )
 			{
-				if( !Test2FeatureMapper.getDefault().getConcernModel().exists( DEFAULT_CONCERN_NAME + " " + lIndex ) )
+				if( !ConcernMapper.getDefault().getConcernModel().exists( DEFAULT_CONCERN_NAME + " " + lIndex ) )
 				{
 					lNewConcernItem.setText( DEFAULT_CONCERN_NAME + " " + lIndex );
 					break;
@@ -257,7 +257,7 @@ public class AddToConcernAction implements IObjectActionDelegate, IEditorActionD
 					// The selection does not resolve to an IJavaElement
 					if( lEditorStatusLine != null )
 					{
-						lEditorStatusLine.setMessage( true, Test2FeatureMapper.getResourceString( 
+						lEditorStatusLine.setMessage( true, ConcernMapper.getResourceString( 
 										"actions.AddToConcernAction.SelectionNotResolvable" ), null );
 					}
 				}
@@ -285,7 +285,7 @@ public class AddToConcernAction implements IObjectActionDelegate, IEditorActionD
 					else
 					{
 						// The element is not supported by ConcernMapper
-						String lMessage = Test2FeatureMapper.getResourceString( "actions.AddToConcernAction.ElementNotSupported" );
+						String lMessage = ConcernMapper.getResourceString( "actions.AddToConcernAction.ElementNotSupported" );
 						if( lEditorStatusLine != null )
 						{
 							lEditorStatusLine.setMessage( true, lMessage, null );
@@ -422,15 +422,15 @@ public class AddToConcernAction implements IObjectActionDelegate, IEditorActionD
       	 */
       	private void addToConcern( IJavaElement pElement, String pConcern)
       	{
-      		if( !Test2FeatureMapper.getDefault().getConcernModel().exists( pConcern ) )
+      		if( !ConcernMapper.getDefault().getConcernModel().exists( pConcern ) )
 			{
-				Test2FeatureMapper.getDefault().getConcernModel().newConcern( pConcern );
+				ConcernMapper.getDefault().getConcernModel().newConcern( pConcern );
 			}
-			if( !Test2FeatureMapper.getDefault().getConcernModel().exists( pConcern, pElement ) )
+			if( !ConcernMapper.getDefault().getConcernModel().exists( pConcern, pElement ) )
 			{
-				Test2FeatureMapper.getDefault().getConcernModel().addElement( pConcern, pElement, MAX_DEGREE );
-				MapView lView = (MapView)PlatformUI.getWorkbench().
-					getActiveWorkbenchWindow().getActivePage().findView( Test2FeatureMapper.ID_VIEW );
+				ConcernMapper.getDefault().getConcernModel().addElement( pConcern, pElement, MAX_DEGREE );
+				ConcernMapperView lView = (ConcernMapperView)PlatformUI.getWorkbench().
+					getActiveWorkbenchWindow().getActivePage().findView( ConcernMapper.ID_VIEW );
 				lView.setConcernToReveal( pConcern );
 				lView.addElementToReveal( pElement );
 			}
