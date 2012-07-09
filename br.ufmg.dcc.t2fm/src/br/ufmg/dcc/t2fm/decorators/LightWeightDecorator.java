@@ -161,9 +161,9 @@ public class LightWeightDecorator extends LabelProvider implements ConcernModelC
 		IDecoratorManager lDecoratorManager =
 			Test2FeatureMapper.getDefault().getWorkbench().getDecoratorManager();
 		
-		if ( lDecoratorManager.getEnabled( "ca.mcgill.cs.serg.cm.decorator" ))
+		if ( lDecoratorManager.getEnabled( "br.ufmg.dcc.t2fm.decorator" ))
 		{
-			return (LightWeightDecorator) lDecoratorManager.getBaseLabelProvider( "ca.mcgill.cs.serg.cm.decorator" );
+			return (LightWeightDecorator) lDecoratorManager.getBaseLabelProvider( "br.ufmg.dcc.t2fm.decorator" );
 		}
 		return null;
 	}
