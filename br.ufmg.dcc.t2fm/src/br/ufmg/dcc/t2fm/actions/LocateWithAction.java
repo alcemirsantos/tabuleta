@@ -14,25 +14,34 @@ package br.ufmg.dcc.t2fm.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
+import br.ufmg.dcc.t2fm.views.components.ConcernNode;
+
 /**
+ * this class will be load when the contextmenu "Locate With..." be clicked.
+ *  
  * @author Alcemir R. Santos
  *
  */
 public class LocateWithAction implements IObjectActionDelegate {
 
+	private ISelection selection;
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	@Override
 	public void run(IAction action) {
-		// TODO Auto-generated method stub
-
+		if (!(selection instanceof IStructuredSelection)) 
+			return;
+		IStructuredSelection structured = (IStructuredSelection) selection;
+		ConcernNode cnode = (ConcernNode) structured.getFirstElement();
+		// TODO run eclemma
 	}
 
-	ISelection selection;
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
 	 */
