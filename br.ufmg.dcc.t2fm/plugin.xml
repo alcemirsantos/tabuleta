@@ -66,6 +66,21 @@ http://www.eclipse.org/legal/epl-v10.html
                style="pulldown">
          </action>
       </objectContribution>
+      
+      <!-- Seguindo o exemplo do GAMMA ... -->
+      <objectContribution
+            id ="br.ufmg.dcc.t2fm.locateWith.objectContribution"
+            objectClass = "br.ufmg.dcc.t2fm.views.components.ConcernNode" >
+            <action
+                  id ="br.ufmg.dcc.t2fm.locateWith.action"
+                  label = "Locate With..." 
+                  style = "pulldown" 
+                  class = "br.ufmg.dcc.t2fm.actions.LocateWithAction"
+                  enableFor = "1" >
+            </action>
+      </objectContribution>
+      <!---->      
+      
       <viewerContribution
             id="br.ufmg.dcc.t2fm.addToFeatureEditorContribution"
             targetID="org.eclipse.jdt.ui.CompilationUnitEditor.EditorContext">
@@ -109,5 +124,46 @@ http://www.eclipse.org/legal/epl-v10.html
 	  <initializer 
 	  	class="br.ufmg.dcc.t2fm.ConcernMapperPreferenceInitializer"/>
    </extension>
-
+   
+   <extension
+         point="org.eclipse.debug.ui.launchGroups">
+      <launchGroup
+            bannerImage=""
+            id="com.mountainminds.eclemma.ui.launchGroup.coverage"
+            image=""
+            label="Coverage"
+            mode="coverage"
+            title="Own Coverage"/>
+   </extension>
+<extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            label="%JUnitTestShortcut.label"
+            icon="$nl$/icons/full/etool16/junit_launch.gif"
+            class="com.mountainminds.eclemma.ui.launching.CoverageLaunchShortcut:org.eclipse.jdt.junit.junitShortcut"
+            modes="coverage"
+            id="com.mountainminds.eclemma.ui.junitShortcut">
+         <contextualLaunch>
+           <enablement>
+             <with variable="selection">
+               <test property="com.mountainminds.eclemma.ui.launchable" args="org.eclipse.jdt.junit.junitShortcut"/>
+             </with>
+           </enablement>
+         </contextualLaunch>
+      </shortcut>
+      <shortcut
+            label="%JUnitRAPTestShortcut.label "
+            icon="$nl$/icons/full/etool16/junitplugin_launch.gif"
+            modes="coverage"
+            class="com.mountainminds.eclemma.ui.launching.CoverageLaunchShortcut:org.eclipse.rap.ui.launch.RAPJUnitLaunchShortcut"
+            id="com.mountainminds.eclemma.ui.RAPJUnitLaunchShortcut">
+         <contextualLaunch>
+            <enablement>
+               <with variable="selection">
+                  <test property="com.mountainminds.eclemma.ui.launchable" args="org.eclipse.rap.ui.launch.RAPJUnitLaunchShortcut"/>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
 </plugin>
