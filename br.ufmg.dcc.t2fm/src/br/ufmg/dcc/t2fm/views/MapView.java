@@ -680,7 +680,7 @@ public class MapView extends ViewPart implements ConcernModelChangeListener, IPr
 						pManager.add( new RenameConcernAction( this, ((ConcernNode)lNext).getConcernName() ));
 						// TODO add run tests with eclemma
 						pManager.add( new RunAllAction());
-						pManager.add(new CoverageAsAction());
+//						pManager.add(new CoverageAsAction());
 					}
 					else
 					{

@@ -135,35 +135,103 @@ http://www.eclipse.org/legal/epl-v10.html
             mode="coverage"
             title="Own Coverage"/>
    </extension>
-<extension
+   
+	<!-- : EclEmma-UI extensions :-->
+	<!-- Action Set -->
+	 <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.mountainminds.eclemma.ui.CoverageActionSet"
+            label="%CoverageActionSet.label"
+            visible="false">
+         <menu
+               id="org.eclipse.ui.run"
+               label="%RunMenu.label"
+               path="additions">
+            <separator name="relaunchGroup"/>
+            <separator name="emptyLaunchGroup"/>
+         </menu>
+         <action
+               class="com.mountainminds.eclemma.internal.ui.actions.CoverageAsAction"
+               id="com.mountainminds.eclemma.ui.actions.CoverageAsAction"
+               label="CoverageAsS"
+               menubarPath="org.eclipse.ui.run/emptyLaunchGroup"
+               style="pulldown"/>
+      </actionSet>
+   </extension>
+	<!-- Launch Shortcuts -->
+	<extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
-            label="%JUnitTestShortcut.label"
-            icon="$nl$/icons/full/etool16/junit_launch.gif"
+            label="JUnit Testt"
+            icon="icons/junit_launch.gif"
             class="com.mountainminds.eclemma.ui.launching.CoverageLaunchShortcut:org.eclipse.jdt.junit.junitShortcut"
             modes="coverage"
             id="com.mountainminds.eclemma.ui.junitShortcut">
          <contextualLaunch>
            <enablement>
              <with variable="selection">
-               <test property="com.mountainminds.eclemma.ui.launchable" args="org.eclipse.jdt.junit.junitShortcut"/>
+               <test
+					property="com.mountainminds.eclemma.ui.launchable" 
+              		args="org.eclipse.jdt.junit.junitShortcut"/>
              </with>
            </enablement>
          </contextualLaunch>
       </shortcut>
-      <shortcut
-            label="%JUnitRAPTestShortcut.label "
-            icon="$nl$/icons/full/etool16/junitplugin_launch.gif"
+   </extension>
+   <!-- Commands -->
+    <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="com.mountainminds.eclemma.ui"
+            name="Test2Feature Mapper">
+      </category>
+     
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
+            description="%CoverageJUnitTestCommand.description"
+            id="com.mountainminds.eclemma.ui.junitShortcut.coverage"
+            name="%CoverageJUnitTestCommand.name"/>
+   </extension>
+   <!-- Key Bindings -->
+   <extension
+         point="org.eclipse.ui.bindings">
+       <key
+            commandId="com.mountainminds.eclemma.ui.junitShortcut.coverage"
+            contextId="org.eclipse.ui.globalScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+M2+E T"/>
+   </extension>
+   <!-- Perspective Extensions -->
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <actionSet id="com.mountainminds.eclemma.ui.CoverageActionSet"/>
+         <showInPart id="com.mountainminds.eclemma.ui.CoverageView"/>
+      </perspectiveExtension>
+   </extension>
+   <!-- Configuration Tab Groups -->
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="com.mountainminds.eclemma.ui.launching.CoverageTabGroup"
+            helpContextId="com.mountainminds.eclemma.ui.coverage_launch_context"
+            id="com.mountainminds.eclemma.ui.JUnitTabGroup"
+            type="org.eclipse.jdt.junit.launchconfig">
+         <launchMode
+               description="%junitTabGroupDescription.coverage"
+               mode="coverage"/>
+      </launchConfigurationTabGroup>
+   </extension>
+   <!-- : EclEmma-Core Extensions : -->
+   <!-- Launch Delegates-->
+   <extension
+         point="org.eclipse.debug.core.launchDelegates">
+      <launchDelegate
+            delegate="com.mountainminds.eclemma.core.launching.JavaApplicationLauncher"
+            id="com.mountainminds.eclemma.core.junitLauncher"
             modes="coverage"
-            class="com.mountainminds.eclemma.ui.launching.CoverageLaunchShortcut:org.eclipse.rap.ui.launch.RAPJUnitLaunchShortcut"
-            id="com.mountainminds.eclemma.ui.RAPJUnitLaunchShortcut">
-         <contextualLaunch>
-            <enablement>
-               <with variable="selection">
-                  <test property="com.mountainminds.eclemma.ui.launchable" args="org.eclipse.rap.ui.launch.RAPJUnitLaunchShortcut"/>
-               </with>
-            </enablement>
-         </contextualLaunch>
-      </shortcut>
+            name="%junitDelegateName"
+            type="org.eclipse.jdt.junit.launchconfig"/>
    </extension>
 </plugin>
