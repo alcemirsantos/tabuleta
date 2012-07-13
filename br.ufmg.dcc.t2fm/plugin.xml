@@ -234,4 +234,28 @@ http://www.eclipse.org/legal/epl-v10.html
             name="%junitDelegateName"
             type="org.eclipse.jdt.junit.launchconfig"/>
    </extension>
+   <!-- End EclEmma Config -->
+   
+   
+   
+   <!-- 1st step: Launch Configuration Type -->
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            name="Feature Node"
+            delegate="com.mountainminds.eclemma.core.launching.JavaApplicationLauncher"
+            modes="run"
+            id="br.ufmg.dcc.t2fm.feature.launchConfigurationType">
+      </launchConfigurationType>
+   </extension>
+   
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="br.ufmg.dcc.t2fm.feature.launchConfigurationType"
+            icon="icons/junit_launch.gif"
+            id="br.ufmg.dcc.t2fm.feature.launchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+   </extension>
+   <!--  -->
 </plugin>
