@@ -12,12 +12,19 @@
  *************************************************************************/
 package br.ufmg.dcc.t2fm.launching;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.launching.JavaRuntime;
 
+import br.ufmg.dcc.t2fm.Test2FeatureMapper;
+
+import com.mountainminds.eclemma.core.ScopeUtils;
 import com.mountainminds.eclemma.core.launching.CoverageLauncher;
 
 /**
@@ -32,8 +39,16 @@ public class FeatureNodeLauncher extends CoverageLauncher {
 	@Override
 	public Set<IPackageFragmentRoot> getOverallScope(
 			ILaunchConfiguration configuration) throws CoreException {
-		// TODO Auto-generated method stub
-		return null;
+				return null;
+//		 final IJavaProject project = JavaRuntime.getJavaProject(configuration);
+//		    
+//		 Test2FeatureMapper.getDefault().getConcernModel().getElements(configuration.)
+//		 
+//		    if (project == null) {
+//		      return Collections.emptySet();
+//		    } else {
+//		      return ScopeUtils.filterJREEntries(Arrays.asList(project.getAllPackageFragmentRoots()));
+//		    }
 	}
 
 }

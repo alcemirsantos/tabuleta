@@ -78,9 +78,6 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.views.navigator.LocalSelectionTransfer;
 
-import com.mountainminds.eclemma.internal.ui.actions.ContextualLaunchableTester;
-import com.mountainminds.eclemma.internal.ui.actions.CoverageAsAction;
-
 import br.ufmg.dcc.t2fm.Test2FeatureMapper;
 import br.ufmg.dcc.t2fm.actions.ClearAction;
 import br.ufmg.dcc.t2fm.actions.CollapseAllAction;
@@ -89,7 +86,6 @@ import br.ufmg.dcc.t2fm.actions.FilterAction;
 import br.ufmg.dcc.t2fm.actions.LoadConcernModelAction;
 import br.ufmg.dcc.t2fm.actions.NewConcernAction;
 import br.ufmg.dcc.t2fm.actions.RenameConcernAction;
-import br.ufmg.dcc.t2fm.actions.RunAllAction;
 import br.ufmg.dcc.t2fm.actions.SaveAction;
 import br.ufmg.dcc.t2fm.actions.SaveAsAction;
 import br.ufmg.dcc.t2fm.actions.ShowInconsistentElementsAction;
@@ -679,7 +675,6 @@ public class MapView extends ViewPart implements ConcernModelChangeListener, IPr
 					{
 						pManager.add( new RenameConcernAction( this, ((ConcernNode)lNext).getConcernName() ));
 						// TODO add run tests with eclemma
-						pManager.add( new RunAllAction());
 //						pManager.add(new CoverageAsAction());
 					}
 					else
