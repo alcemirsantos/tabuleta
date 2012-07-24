@@ -20,7 +20,7 @@ http://www.eclipse.org/legal/epl-v10.html
             id="br.ufmg.dcc.t2fm">
       </category>
       <view
-            name="Map View"
+            name="T2FMapping View"
             icon="icons/sample.gif"
             category="br.ufmg.dcc.t2fm"
             class="br.ufmg.dcc.t2fm.views.MapView"
@@ -113,16 +113,6 @@ http://www.eclipse.org/legal/epl-v10.html
    <!--  -->
    
    <!-- Launch Configuration Type -->
-	<extension point = "org.eclipse.debug.core.launchConfigurationTypes">
-	   <launchConfigurationType
-	   	   id="br.ufmg.dcc.t2fm.launching.featureTestsFiles"
-	   	   name="Feature Tests Files"
-	   	   delegate="com.mountainminds.eclemma.core.launching.JavaApplicationLauncher"
-	   	   modes= "run, coverage"
-	   	   sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
-	   	   sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
-	   </launchConfigurationType>
-	</extension>
 	
 	<!-- Launch Modes -->
 	<extension point="org.eclipse.debug.core.launchModes">
@@ -133,26 +123,8 @@ http://www.eclipse.org/legal/epl-v10.html
 	</extension>
 	
 	<!-- Launch Delegates -->
-	<extension point="org.eclipse.debug.core.launchDelegates">
-		<launchDelegate
-			id="br.ufmg.dcc.t2fm.feature.CoverageDelegate"
-			delegate="com.mountainminds.eclemma.core.launching.JavaApplicationLauncher"
-			type="br.ufmg.dcc.t2fm.launching.featureTestsFiles"
-			modes="coverage">
-		</launchDelegate>
- 	</extension>
     
     <!-- Launch Shortcut -->
-    <extension point="org.eclipse.debug.ui.launchShortcuts">
-    	<shortcut
-    	   id="br.ufmg.dcc.t2fm.feature.CodeLocationShortcut"
-    	   class="com.mountainminds.eclemma.ui.launching.CoverageLaunchShortcut"
-    	   label="JUnit Testtt"
-    	   icon="icons/full/ctool16/java_applet.gif"
-    	   modes="run, coverage">
-               <perspective id="org.eclipse.jdt.ui.JavaPerspective"/>
-   		</shortcut>
-   	</extension>
    
     <!-- Launch Groups -->	
    	<extension point = "org.eclipse.debug.ui.launchGroups">
@@ -172,4 +144,143 @@ http://www.eclipse.org/legal/epl-v10.html
 		</launchGroup> 
 	</extension>
    <!--  -->
+   <!--  -->
+   <!--  backup  -->
+   <!--  -->
+   <!--  -->
+   
+	<!-- : EclEmma-UI extensions :-->
+	<!--  Property Tester-->   
+	   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="com.mountainminds.eclemma.internal.ui.actions.ContextualLaunchableTester"
+            id="com.mountainminds.eclemma.ui.propertyTester.contextualLaunchable"
+            namespace="com.mountainminds.eclemma.ui"
+            properties="launchable"
+            type="java.lang.Object"/>
+   </extension>
+	   <!--extension  point="org.eclipse.core.expressions.propertyTesters">
+	   	<propertyTester
+	   		class="br.ufmg.dcc.t2fm.launching.FetureNodeLaunchableTester"
+            id="br.ufmg.dcc.t2fm.launching.propertyTester.contextualLaunchable"
+            namespace="br.ufmg.dcc.t2fm.ui"
+            properties="launchable"
+            type="br.ufmg.dcc.t2fm.views.components.ConcernNode"/>
+        </extension-->
+	<!-- Action Set -->
+	 <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.mountainminds.eclemma.ui.CoverageActionSet"
+            label="%CoverageActionSet.label"
+            visible="false">
+         <menu
+               id="org.eclipse.ui.run"
+               label="%RunMenu.label"
+               path="additions">
+            <separator name="relaunchGroup"/>
+            <separator name="emptyLaunchGroup"/>
+         </menu>
+         <action
+               class="com.mountainminds.eclemma.internal.ui.actions.CoverageAsAction"
+               id="com.mountainminds.eclemma.ui.actions.CoverageAsAction"
+               label="CoverageAsS"
+               menubarPath="org.eclipse.ui.run/emptyLaunchGroup"
+               style="pulldown"/>
+      </actionSet>
+   </extension>
+	<!-- Launch Shortcuts -->
+	<extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            label="JUnit Testt"
+            icon="icons/junit_launch.gif"
+            class="com.mountainminds.eclemma.ui.launching.CoverageLaunchShortcut:org.eclipse.jdt.junit.junitShortcut"
+            modes="run , coverage"
+            id="com.mountainminds.eclemma.ui.junitShortcut">
+            <perspective id="org.eclipse.jdt.ui.JavaPerspective"/>
+         <contextualLaunch>
+           <enablement>
+             <with variable="selection">
+               <test
+					property="com.mountainminds.eclemma.ui.launchable" 
+              		args="org.eclipse.jdt.junit.junitShortcut"/>
+             </with>
+
+           </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
+   <!-- Commands -->
+    <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="com.mountainminds.eclemma.ui"
+            name="Test2Feature Mapper">
+      </category>
+     
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
+            description="%CoverageJUnitTestCommand.description"
+            id="com.mountainminds.eclemma.ui.junitShortcut.coverage"
+            name="%CoverageJUnitTestCommand.name"/>
+   </extension>
+   <!-- Key Bindings -->
+   <extension
+         point="org.eclipse.ui.bindings">
+       <key
+            commandId="com.mountainminds.eclemma.ui.junitShortcut.coverage"
+            contextId="org.eclipse.ui.globalScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+M2+E T"/>
+   </extension>
+   <!-- Perspective Extensions -->
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <actionSet id="com.mountainminds.eclemma.ui.CoverageActionSet"/>
+         <showInPart id="com.mountainminds.eclemma.ui.CoverageView"/>
+      </perspectiveExtension>
+   </extension>
+   <!-- Configuration Tab Groups -->
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="com.mountainminds.eclemma.ui.launching.CoverageTabGroup"
+            helpContextId="com.mountainminds.eclemma.ui.coverage_launch_context"
+            id="com.mountainminds.eclemma.ui.JUnitTabGroup"
+            type="org.eclipse.jdt.junit.launchconfig">
+         <launchMode
+               description="%junitTabGroupDescription.coverage"
+               mode="coverage"/>
+      </launchConfigurationTabGroup>
+   </extension>
+   <!-- : EclEmma-Core Extensions : -->
+   <!-- Launch Delegates-->
+   <extension
+         point="org.eclipse.debug.core.launchDelegates">
+      <launchDelegate
+            delegate="br.ufmg.dcc.t2fm.actions.LocateAction"
+            id="com.mountainminds.eclemma.core.junitLauncher"
+            modes="coverage"
+            name="%junitDelegateName"
+            type="org.eclipse.jdt.junit.launchconfig"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+      		class=""
+            adaptableType="br.ufmg.dcc.t2fm.views.components.ConcernNode">
+         <adapter
+               type="org.eclipse.debug.ui.actions.ILaunchable">
+         </adapter>
+      </factory>
+   </extension>
+   <!-- End EclEmma Config -->
+   
+   
+   
+   <!-- 1st step: Launch Configuration Type -->
+   
 </plugin>

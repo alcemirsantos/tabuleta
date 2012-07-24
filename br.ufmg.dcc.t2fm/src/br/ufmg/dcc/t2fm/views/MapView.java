@@ -78,12 +78,15 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.views.navigator.LocalSelectionTransfer;
 
+import com.mountainminds.eclemma.internal.ui.actions.CoverageAsAction;
+
 import br.ufmg.dcc.t2fm.Test2FeatureMapper;
 import br.ufmg.dcc.t2fm.actions.ClearAction;
 import br.ufmg.dcc.t2fm.actions.CollapseAllAction;
 import br.ufmg.dcc.t2fm.actions.DeleteAction;
 import br.ufmg.dcc.t2fm.actions.FilterAction;
 import br.ufmg.dcc.t2fm.actions.LoadConcernModelAction;
+import br.ufmg.dcc.t2fm.actions.LocateAction;
 import br.ufmg.dcc.t2fm.actions.NewConcernAction;
 import br.ufmg.dcc.t2fm.actions.RenameConcernAction;
 import br.ufmg.dcc.t2fm.actions.SaveAction;
@@ -136,6 +139,9 @@ public class MapView extends ViewPart implements ConcernModelChangeListener, IPr
 		private String aConcernToReveal = null;
 		private HashSet<Object> aElementsToReveal = new HashSet<Object>();
 		private Composite aParent;
+		private LocateAction aLocateAction;
+
+
 		
 		/**
 		 * This is a callback that will allow us
@@ -453,6 +459,8 @@ public class MapView extends ViewPart implements ConcernModelChangeListener, IPr
 		    aSaveAction = new SaveAction( this );
 		    aSaveAction.setEnabled( Test2FeatureMapper.getDefault().isDirty() );
 		    
+//		    aLocateAction = new LocateAction( this );
+//		    aLocateAction.setEnabled( aViewer.getSelection()!=null?true:false);
 		    
 		    aDoubleClickAction = new Action() 
 			{
@@ -651,6 +659,7 @@ public class MapView extends ViewPart implements ConcernModelChangeListener, IPr
 		private void fillLocalToolBar( IToolBarManager pManager ) 
 		{
 			pManager.add( new ClearAction());
+//			pManager.add( new LocateAction(this));
 			pManager.add( aSaveAction );
 			pManager.add( new SaveAsAction( this ));
 			pManager.add( new NewConcernAction( this ));
@@ -675,7 +684,7 @@ public class MapView extends ViewPart implements ConcernModelChangeListener, IPr
 					{
 						pManager.add( new RenameConcernAction( this, ((ConcernNode)lNext).getConcernName() ));
 						// TODO add run tests with eclemma
-//						pManager.add(new CoverageAsAction());
+						pManager.add(new CoverageAsAction());
 					}
 					else
 					{

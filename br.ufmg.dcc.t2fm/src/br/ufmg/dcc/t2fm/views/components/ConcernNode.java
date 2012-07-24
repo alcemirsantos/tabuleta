@@ -10,10 +10,12 @@
 
 package br.ufmg.dcc.t2fm.views.components;
 
+import org.eclipse.debug.ui.actions.ILaunchable;
+
 /**
  * A node representing a concern in the ConcernMapperView.
  */
-public class ConcernNode extends AbstractElementNode 
+public class ConcernNode extends AbstractElementNode implements ILaunchable
 {
 	private String aConcernName;
 	
