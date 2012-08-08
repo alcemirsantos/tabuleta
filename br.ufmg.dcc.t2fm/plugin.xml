@@ -261,7 +261,7 @@ http://www.eclipse.org/legal/epl-v10.html
    <extension
          point="org.eclipse.debug.core.launchDelegates">
       <launchDelegate
-            delegate="br.ufmg.dcc.t2fm.actions.LocateAction"
+            delegate="com.mountainminds.eclemma.core.launching.JavaApplicationLauncher"
             id="com.mountainminds.eclemma.core.junitLauncher"
             modes="coverage"
             name="%junitDelegateName"
@@ -276,11 +276,13 @@ http://www.eclipse.org/legal/epl-v10.html
                type="org.eclipse.debug.ui.actions.ILaunchable">
          </adapter>
       </factory>
+      <!--factory
+      		class = "br.ufmg.dcc.t2fm.launching.adapter.FeatureNodeAdapterFactory"
+            adaptableType="br.ufmg.dcc.t2fm.views.components.ConcernNode">
+         <adapter
+               type="org.eclipse.core.resources.mapping.ResourceMapping">
+         </adapter>
+      </factory-->
    </extension>
    <!-- End EclEmma Config -->
-   
-   
-   
-   <!-- 1st step: Launch Configuration Type -->
-   
 </plugin>
