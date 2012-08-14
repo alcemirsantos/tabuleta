@@ -86,7 +86,6 @@ import br.ufmg.dcc.t2fm.actions.CollapseAllAction;
 import br.ufmg.dcc.t2fm.actions.DeleteAction;
 import br.ufmg.dcc.t2fm.actions.FilterAction;
 import br.ufmg.dcc.t2fm.actions.LoadConcernModelAction;
-import br.ufmg.dcc.t2fm.actions.LocateAction;
 import br.ufmg.dcc.t2fm.actions.NewConcernAction;
 import br.ufmg.dcc.t2fm.actions.RenameConcernAction;
 import br.ufmg.dcc.t2fm.actions.SaveAction;
@@ -139,8 +138,6 @@ public class MapView extends ViewPart implements ConcernModelChangeListener, IPr
 		private String aConcernToReveal = null;
 		private HashSet<Object> aElementsToReveal = new HashSet<Object>();
 		private Composite aParent;
-		private LocateAction aLocateAction;
-
 
 		
 		/**

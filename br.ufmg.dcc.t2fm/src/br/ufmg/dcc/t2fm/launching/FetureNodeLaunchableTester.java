@@ -26,11 +26,11 @@ public class FetureNodeLaunchableTester extends PropertyTester {
 	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object, java.lang.String, java.lang.Object[], java.lang.Object)
 	 */
 	@Override
-	public boolean test(Object receiver, String property, Object[] args,
-			Object expectedValue) {
-		ConcernNode cn = (ConcernNode) receiver;
-		
+	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
+		if (property.equals("launchable")) {
+			return true;
+		}		
 		return false;
 	}
-
+	
 }

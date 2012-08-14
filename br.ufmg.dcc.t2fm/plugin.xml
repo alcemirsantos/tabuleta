@@ -159,7 +159,7 @@ http://www.eclipse.org/legal/epl-v10.html
             namespace="com.mountainminds.eclemma.ui"
             properties="launchable"
             type="java.lang.Object"/>
-   </extension>
+   		</extension>
 	   <!--extension  point="org.eclipse.core.expressions.propertyTesters">
 	   	<propertyTester
 	   		class="br.ufmg.dcc.t2fm.launching.FetureNodeLaunchableTester"
@@ -168,28 +168,6 @@ http://www.eclipse.org/legal/epl-v10.html
             properties="launchable"
             type="br.ufmg.dcc.t2fm.views.components.ConcernNode"/>
         </extension-->
-	<!-- Action Set -->
-	 <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="com.mountainminds.eclemma.ui.CoverageActionSet"
-            label="%CoverageActionSet.label"
-            visible="false">
-         <menu
-               id="org.eclipse.ui.run"
-               label="%RunMenu.label"
-               path="additions">
-            <separator name="relaunchGroup"/>
-            <separator name="emptyLaunchGroup"/>
-         </menu>
-         <action
-               class="com.mountainminds.eclemma.internal.ui.actions.CoverageAsAction"
-               id="com.mountainminds.eclemma.ui.actions.CoverageAsAction"
-               label="CoverageAsS"
-               menubarPath="org.eclipse.ui.run/emptyLaunchGroup"
-               style="pulldown"/>
-      </actionSet>
-   </extension>
 	<!-- Launch Shortcuts -->
 	<extension
          point="org.eclipse.debug.ui.launchShortcuts">
