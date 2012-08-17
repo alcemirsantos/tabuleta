@@ -151,7 +151,7 @@ http://www.eclipse.org/legal/epl-v10.html
    
 	<!-- : EclEmma-UI extensions :-->
 	<!--  Property Tester-->   
-	   <extension
+	   <!--extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
             class="com.mountainminds.eclemma.internal.ui.actions.ContextualLaunchableTester"
@@ -159,15 +159,15 @@ http://www.eclipse.org/legal/epl-v10.html
             namespace="com.mountainminds.eclemma.ui"
             properties="launchable"
             type="java.lang.Object"/>
-   		</extension>
-	   <!--extension  point="org.eclipse.core.expressions.propertyTesters">
+   		</extension-->
+	   <extension  point="org.eclipse.core.expressions.propertyTesters">
 	   	<propertyTester
 	   		class="br.ufmg.dcc.t2fm.launching.FetureNodeLaunchableTester"
             id="br.ufmg.dcc.t2fm.launching.propertyTester.contextualLaunchable"
             namespace="br.ufmg.dcc.t2fm.ui"
             properties="launchable"
-            type="br.ufmg.dcc.t2fm.views.components.ConcernNode"/>
-        </extension-->
+            type="java.lang.Object"/>
+        </extension>
 	<!-- Launch Shortcuts -->
 	<extension
          point="org.eclipse.debug.ui.launchShortcuts">
@@ -182,7 +182,7 @@ http://www.eclipse.org/legal/epl-v10.html
            <enablement>
              <with variable="selection">
                <test
-					property="com.mountainminds.eclemma.ui.launchable" 
+					property="br.ufmg.dcc.t2fm.ui.launchable" 
               		args="org.eclipse.jdt.junit.junitShortcut"/>
              </with>
 
