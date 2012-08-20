@@ -85,6 +85,7 @@ import br.ufmg.dcc.t2fm.actions.ClearAction;
 import br.ufmg.dcc.t2fm.actions.CollapseAllAction;
 import br.ufmg.dcc.t2fm.actions.DeleteAction;
 import br.ufmg.dcc.t2fm.actions.FilterAction;
+import br.ufmg.dcc.t2fm.actions.GenerateTestSuiteAction;
 import br.ufmg.dcc.t2fm.actions.LoadConcernModelAction;
 import br.ufmg.dcc.t2fm.actions.NewConcernAction;
 import br.ufmg.dcc.t2fm.actions.RenameConcernAction;
@@ -657,11 +658,13 @@ public class MapView extends ViewPart implements ConcernModelChangeListener, IPr
 		{
 			pManager.add( new ClearAction());
 //			pManager.add( new LocateAction(this));
+			pManager.add( new GenerateTestSuiteAction(this) );
 			pManager.add( aSaveAction );
 			pManager.add( new SaveAsAction( this ));
 			pManager.add( new NewConcernAction( this ));
 			pManager.add( new Separator() );
 			pManager.add( new CollapseAllAction( this ));
+			
 		}
 		
 		/**
