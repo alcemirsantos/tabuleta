@@ -30,6 +30,7 @@ import org.eclipse.ui.dialogs.SaveAsDialog;
 
 import br.ufmg.dcc.t2fm.Test2FeatureMapper;
 import br.ufmg.dcc.t2fm.actions.SaveAsAction.ConcernModelSaveAsDialog;
+import br.ufmg.dcc.t2fm.model.io.JavaFileWriter;
 import br.ufmg.dcc.t2fm.model.io.ModelIOException;
 import br.ufmg.dcc.t2fm.model.io.ModelWriter;
 import br.ufmg.dcc.t2fm.ui.ConcernMapperPreferencePage;
