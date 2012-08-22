@@ -61,76 +61,44 @@ public class GenerateTestSuiteAction extends Action {
 		
 		lDialog.open();
 		
-		if( lDialog.getReturnCode() == Window.CANCEL )
-		{
+		if( lDialog.getReturnCode() == Window.CANCEL )	{
 			return;
 		}
 		
 		IPath lPath = lDialog.getResult();
+
+		IWorkspace lWorkspace = ResourcesPlugin.getWorkspace();
+		IPath s = lWorkspace.getRoot().getLocation();
 		
-		String src = lPath.segment(0);
+		String src = s.toString() + File.separator +lPath.segment(0) + File.separator + lPath.segment(1);
 		String pakkage = buildPackage(lPath);
 		String className = lPath.lastSegment();
 
-		lPath = addJavaFileExtension( lPath );
-		
-		IWorkspace lWorkspace = ResourcesPlugin.getWorkspace();
 		lFile = lWorkspace.getRoot().getFile( lPath );
 		
-		IPath s = lWorkspace.getRoot().getLocation();
-		src = buildSource(s)+File.separator+src;
-		if( !lFile.exists() )
-		{
-//			try {
-//				lFile.create( null, true, null );
-//			} catch (CoreException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+		if( !lFile.exists() ){
 			JavaFileWriter lWriter = new JavaFileWriter(src, pakkage, className, Test2FeatureMapper.getDefault().getConcernModel() );
-			lWriter.write( lFile );
+			lWriter.write(aView.getCurrentSelection());
+		}else{
+			// TODO ask if wants to overwrite the already existent file. 
 		}
 		
-		//TODO escrever o arquivo Java da suite de teste
-
+		
 		showMessage("Generate Test Suite Action executed.");
 	}
 
 	private String buildPackage(IPath lPath){
-		String pakkage=lPath.segment(1);
-		for (int i=2; i<lPath.segments().length-1; i++) {
+		String pakkage=lPath.segment(2);
+		for (int i=3; i<lPath.segments().length-1; i++) {
 			pakkage += "."+lPath.segment(i);
 		}
 		return pakkage;
 	}
 	
-	private String buildSource(IPath lPath){
-		String pakkage=lPath.segment(0);
-		for (int i=1; i<lPath.segments().length; i++) {
-			pakkage += File.separator+lPath.segment(i);
-		}
-		return pakkage;
-	}
 	private void showMessage(String message) {
 		MessageDialog.openInformation(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Test2FeatureMapper View", message);
-		
 	}
 	
-	private static IPath addJavaFileExtension( IPath pPath )
-	{
-		IPath lReturn = pPath;
-		if ( lReturn.getFileExtension() == null )
-		{
-			lReturn = lReturn.addFileExtension( "java" );
-		}
-		else if ( !lReturn.getFileExtension().equals( "java" ) )
-		{
-			lReturn = lReturn.removeFileExtension();
-			lReturn = lReturn.addFileExtension( "java" );
-		}
-		return lReturn;
-	}
-
 	/**
 	 * We have to define this class simply to be able to change the title
 	 * of the dialog.  This is necessary because when the save as functionality
@@ -139,8 +107,7 @@ public class GenerateTestSuiteAction extends Action {
 	 * 
 	 * @author Alcemir Santos
 	 */
-	class TestSuiteSaveAsDialog extends SaveAsDialog
-	{
+	class TestSuiteSaveAsDialog extends SaveAsDialog{
 		/**
 		 * Creates a new SaveAsDialog for saving concern models.
 		 * @param pShell The parent shell.

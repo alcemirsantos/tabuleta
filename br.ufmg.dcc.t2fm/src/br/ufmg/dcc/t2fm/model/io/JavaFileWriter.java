@@ -14,23 +14,15 @@ package br.ufmg.dcc.t2fm.model.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.PrintStream;
 
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-
+import br.ufmg.dcc.t2fm.actions.RenameConcernAction;
 import br.ufmg.dcc.t2fm.model.ConcernModel;
+import br.ufmg.dcc.t2fm.views.components.ConcernNode;
+import br.ufmg.dcc.t2fm.views.components.JavaElementNode;
 
 /**
  * @author Alcemir R. Santos
@@ -71,108 +63,52 @@ public class JavaFileWriter {
 
 	/**
 	 * Writes the Java file.
+	 * @param iSelection 
 	 * 
 	 * @param model
 	 * 
 	 * @return
 	 */
-	public File write(IFile pFile) {
+	public File write(ISelection iSelection) {
 
-//		/**
-//		 * Creates a file concurrently with other threads.
-//		 */
-//		class CreateFile extends Thread {
-//			private IFile aFile;
-//			private PipedInputStream aInStream;
-//
-//			/**
-//			 * Creates a new file to write to.
-//			 * 
-//			 * @param pFile
-//			 *            The file handle.
-//			 * @param pInStream
-//			 *            An input stream.
-//			 */
-//			public CreateFile(IFile pFile, PipedInputStream pInStream) {
-//				aFile = pFile;
-//				aInStream = pInStream;
-//				start();
-//			}
-//
-//			/**
-//			 * @see java.lang.Runnable#run()
-//			 */
-//			public void run() {
-//				try {
-//					if (aFile.exists()) {
-//						aFile.setContents(aInStream, true, false, null);
-//					} else {
-//						aFile.create(aInStream, true, null);
-//					}
-//				} catch (CoreException lException) {
-//					throw new RuntimeException(
-//							"Exception while creating a new file", lException);
-//				} finally {
-//					try {
-//						aInStream.close();
-//					} catch (IOException lException) {
-//						throw new RuntimeException(
-//								"Exception while creating a new file",
-//								lException);
-//					}
-//				}
-//			}
-//		}
-//
-//		try {
-//			PipedOutputStream lOutStream = new PipedOutputStream();
-//			PipedInputStream lInStream = new PipedInputStream(lOutStream);
-//			Thread lThread = new CreateFile(pFile, lInStream);
-//
-//			Source lSource = new DOMSource(createDocument());
-//			Result lResult = new StreamResult(lOutStream);
-//			Transformer lTransformer = TransformerFactory.newInstance()
-//					.newTransformer();
-//			lTransformer.transform(lSource, lResult);
-//			
-//			lOutStream.flush();
-//			lOutStream.close();
-//			try {
-//				lThread.join();
-//			} catch (InterruptedException lException) {
-//				// Proceed
-//			}
-//		} catch (TransformerConfigurationException lException) {
-//			throw new ModelIOException(lException.getMessage());
-//		} catch (TransformerException lException) {
-//			throw new ModelIOException(lException.getMessage());
-//		} catch (IOException lException) {
-//			throw new ModelIOException(lException.getMessage());
-//		}
-//
-//		/**
-//		 * fim do modelwrither.java
-//		 */
-		return getDocument();
-	}
-
-	private File getDocument() {
 		File file = new File(getDir(), className + ".java");
 		PrintStream out = createTextOutputStream(file);
 
+		String comment = 
+				"/**************************************************************************\n"+
+				" * Copyright (c) 2012 Federal University of Minas Gerais - UFMG           *\n"+
+				" * All rights avaiable. This program and the accompanying materials       *\n"+
+				" * are made avaiable under the terms of the Eclipse Public Lincense v1.0  *\n"+
+				" * which accompanies this distribution, and is avaiable at                *\n"+
+				" * http://www.eclipse.org/legal/epl-v10.html                              *\n"+
+				" *                                                                        *\n"+
+				" * Contributors:                                                          *\n"+
+				" *   Alcemir R. Santos - improvements on the ConcernMapper                *\n"+
+				" * 			architeture. ConcernMapper is available at                 *\n"+
+				" * 			http://www.cs.mcgill.ca/~martin/cm/                        *\n"+
+				" **************************************************************************/";
 		try {
+			out.println(comment);
 			outputPackageName(out, packageName);
 			out.println();
-			out.println("import junit.framework.*;");
+			out.println("import org.junit.runner.RunWith;");
+			out.println("import org.junit.runners.Suite;");
+			out.println("import org.junit.runners.Suite.SuiteClasses;");
 			out.println();
-			out.println("public class " + className + " extends TestCase {");
+			out.println( getImportsClassesFromModel() );
 			out.println();
-			out.println("  public void test() throws Throwable {");
-			out.println();
-			out.println(indent("if (true) { System.out.println(); System.out.print(\""
-					+ className + ".test\"); }"));
-			out.println();
-			out.println("  }");
+			comment = 
+					"/** \n"+
+					" * Test Suite class automatically generated by Test2FeatureMapper.\n"+
+					" * \n"+
+					" * @author Alcemir R. Santos \n"+
+					" */ ";
+			out.println(comment);
+			out.println("@RunWith(Suite.class)");
+			out.println("@SuiteClasses({");
+			out.println( getClassesFromModel(iSelection));
+			out.println("})");
+			out.println("public class " + className + "{");
 			out.println();
 			out.println("}");
 		} finally {
@@ -181,6 +117,62 @@ public class JavaFileWriter {
 		}
 
 		return file;
+	}
+
+	/**
+	 * Returns the classes to add to the suite class.
+	 * @param iSelection
+	 * @return
+	 */
+	private String getClassesFromModel(ISelection iSelection) {
+		String classes="";
+		IStructuredSelection lStructuredSelection=null;
+		if( iSelection instanceof IStructuredSelection ){
+			lStructuredSelection = (IStructuredSelection) iSelection;
+		}
+		Object lNext = lStructuredSelection.getFirstElement();
+		ConcernNode cn = (ConcernNode) lNext;
+		Object[] objects = cn.getChildren();
+		int count = 0;
+		for (Object object : objects) {
+			if( object instanceof JavaElementNode){
+				JavaElementNode jen = (JavaElementNode) object;
+				classes += jen.getElement().getElementName()+".class";
+			}
+			if (++count == objects.length) {
+				break;
+			}else 
+				classes += ",\n";
+		}
+		return classes;
+	}
+
+	/**
+	 * Returns the imports necessary to the suite class.
+	 * @param model
+	 * @return
+	 */
+	private String getImportsClassesFromModel() {
+		String imports="";
+		IStructuredSelection lStructuredSelection=null;
+		if( iSelection instanceof IStructuredSelection ){
+			lStructuredSelection = (IStructuredSelection) iSelection;
+		}
+		Object lNext = lStructuredSelection.getFirstElement();
+		ConcernNode cn = (ConcernNode) lNext;
+		Object[] objects = cn.getChildren();
+		int count = 0;
+		for (Object object : objects) {
+			if( object instanceof JavaElementNode){
+				JavaElementNode jen = (JavaElementNode) object;
+				imports += jen.getElement().getElementName()+".class";
+			}
+			if (++count == objects.length) {
+				break;
+			}else 
+				imports += ",\n";
+		}
+		return imports;
 	}
 
 	/**
@@ -253,4 +245,7 @@ public class JavaFileWriter {
 			throw new Error("This can't happen");
 		}
 	}
+	/**
+	 *
+	 */
 }
