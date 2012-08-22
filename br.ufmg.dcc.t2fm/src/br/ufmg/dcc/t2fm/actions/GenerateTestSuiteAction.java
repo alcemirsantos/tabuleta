@@ -57,6 +57,11 @@ public class GenerateTestSuiteAction extends Action {
 	public void run()  {
 		IFile lFile = null;
 		
+		if (aView.getCurrentSelection().isEmpty()) {
+			showMessage("You must select a feature.");
+			return;
+		}
+		
 		SaveAsDialog lDialog = new TestSuiteSaveAsDialog( PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell() );
 		
 		lDialog.open();
