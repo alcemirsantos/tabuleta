@@ -91,6 +91,7 @@ import br.ufmg.dcc.t2fm.actions.NewConcernAction;
 import br.ufmg.dcc.t2fm.actions.RenameConcernAction;
 import br.ufmg.dcc.t2fm.actions.SaveAction;
 import br.ufmg.dcc.t2fm.actions.SaveAsAction;
+import br.ufmg.dcc.t2fm.actions.SaveCoverageAsCMAction;
 import br.ufmg.dcc.t2fm.actions.ShowInconsistentElementsAction;
 import br.ufmg.dcc.t2fm.model.ConcernModel;
 import br.ufmg.dcc.t2fm.model.ConcernModelChangeListener;
@@ -658,6 +659,7 @@ public class MapView extends ViewPart implements ConcernModelChangeListener, IPr
 		{
 			pManager.add( new ClearAction());
 //			pManager.add( new LocateAction(this));
+			pManager.add( new SaveCoverageAsCMAction(this) );
 			pManager.add( new GenerateTestSuiteAction(this) );
 			pManager.add( aSaveAction );
 			pManager.add( new SaveAsAction( this ));
