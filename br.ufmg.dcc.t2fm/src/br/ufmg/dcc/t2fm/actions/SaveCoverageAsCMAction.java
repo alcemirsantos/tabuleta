@@ -12,16 +12,19 @@
  *************************************************************************/
 package br.ufmg.dcc.t2fm.actions;
 
+import java.util.Set;
+
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.jacoco.core.analysis.ICoverageNode;
 
+import br.ufmg.dcc.t2fm.views.MapView;
+
 import com.mountainminds.eclemma.core.CoverageTools;
 import com.mountainminds.eclemma.core.ICoverageSession;
-import com.mountainminds.eclemma.internal.core.CoverageSession;
-
-import br.ufmg.dcc.t2fm.views.MapView;
+import com.mountainminds.eclemma.core.ScopeUtils;;
 
 /**
  * @author Alcemir R. Santos
@@ -46,12 +49,17 @@ public class SaveCoverageAsCMAction extends Action {
 		ICoverageSession activeSession = CoverageTools.getSessionManager().getActiveSession();
 		thereIsActiveCoverageSession =  activeSession == null ? false:true ;
 		
-		if(thereIsActiveCoverageSession && "and the element is in scope"){
+		// se existe uma sessão ativa
+		if(thereIsActiveCoverageSession ){
+			Set<IPackageFragmentRoot> escopo =  ScopeUtils.filterJREEntries( activeSession.getScope() );
+			//&& e se o elemento está no escopo
+			for(IPackageFragmentRoot pakkage: escopo){
+				CoverageTools.getCoverageInfo(object);
+				ICoverageNode coverage = (ICoverageNode) someJavaElement.getAdapter(ICoverageNode.class);
+				// TODO criar um concernmodel com o que foi coberto;
+			}
 			
-			CoverageTools.getCoverageInfo(object);
 			
-			ICoverageNode coverage = (ICoverageNode) someJavaElement.getAdapter(ICoverageNode.class);
-			// TODO criar um concernmodel com o que foi coberto;
 		}
 		
 
