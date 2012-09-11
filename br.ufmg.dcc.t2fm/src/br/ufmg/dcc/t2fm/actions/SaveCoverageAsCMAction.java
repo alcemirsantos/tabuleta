@@ -16,20 +16,19 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaModel;
+import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -47,6 +46,7 @@ import br.ufmg.dcc.t2fm.model.ConcernModel;
 import br.ufmg.dcc.t2fm.model.io.ModelIOException;
 import br.ufmg.dcc.t2fm.model.io.ModelWriter;
 import br.ufmg.dcc.t2fm.ui.ConcernMapperPreferencePage;
+import br.ufmg.dcc.t2fm.ui.ProblemManager;
 import br.ufmg.dcc.t2fm.views.MapView;
 
 import com.mountainminds.eclemma.core.CoverageTools;
@@ -59,7 +59,8 @@ import com.mountainminds.eclemma.core.ScopeUtils;
  */
 public class SaveCoverageAsCMAction extends Action {
 
-	MapView aView;
+	private MapView aView;
+	private ConcernModel concernModel;
 
 	/**
 	 * @param mapView
@@ -70,10 +71,10 @@ public class SaveCoverageAsCMAction extends Action {
 		setToolTipText("Save Coverage into a cm File");
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
+		concernModel = new ConcernModel();
 	}
 
 	public void run() {
-		ConcernModel cm = null;
 		boolean thereIsActiveCoverageSession = false;
 		ICoverageSession activeSession = CoverageTools.getSessionManager()
 				.getActiveSession();
@@ -95,22 +96,21 @@ public class SaveCoverageAsCMAction extends Action {
 			while (iterator.hasNext()) {
 				IPackageFragmentRoot fragmentRoot = iterator.next();
 				String s = fragmentRoot.getPath().lastSegment();
-				IJavaModel ijm = fragmentRoot.getJavaModel();
-				IWorkspace workspace = ijm.getWorkspace();
-				IWorkspaceRoot root = workspace.getRoot();
-				// Get all projects in the workspace
-				IProject[] projects = root.getProjects();
 				// Loop over all projects
-				for (IProject project : projects) {
-					try {
-						printProjectInfo(project);
-					} catch (CoreException e) {
-						e.printStackTrace();
-					}
+				IJavaProject ipf = (IJavaProject) fragmentRoot.getParent();
+				IJavaElement[] elements;
+				System.out.println("=====================================\n"
+						+ "================START================\n"
+						+ "=====================================");
+				try {
+					printPackageInfos(ipf);
+				} catch (JavaModelException e) {
+					e.printStackTrace();
 				}
-				System.out.println(s);
-
-				/** criar um concernmodel com o que foi coberto [igual ao listener interno do AddToConcernAction];*/
+				/**
+				 * criar um concernmodel com o que foi coberto [igual ao
+				 * listener interno do AddToConcernAction];
+				 */
 				// CoverageTools.getCoverageInfo(object);
 				// ICoverageNode coverage = (ICoverageNode)
 				// someJavaElement.getAdapter(ICoverageNode.class);
@@ -118,20 +118,59 @@ public class SaveCoverageAsCMAction extends Action {
 
 		}
 
-
 		// TODO escrever no cm file;
-		create File(cm);
-		
+		createFile();
+
 		// TODO matar sessão de cobertura
+	}
+
+	private void createConcernModel(String feature, IPackageFragment mypackage) {
+
+		IJavaElement[] packageElements;
+
+		ICompilationUnit[] units;
+		try {
+			units = mypackage.getCompilationUnits();
+
+			for (ICompilationUnit unit : units) {
+				if (mypackage.hasChildren()) {
+					packageElements = unit.getChildren();
+					for (int i = 0; i < packageElements.length; i++) {
+						IJavaElement lNext = packageElements[i];
+						if (supportedElement(lNext)) {
+							addToConcern(lNext, feature);
+						}
+						// if it is a class or interface, get its members
+						// and add them to the concern
+						else if (supportedType(lNext)) {
+							final IField[] lFields = returnFields((IType) lNext);
+							final IMethod[] lMethods = returnMethods((IType) lNext);
+							for (IField lField : lFields) {
+								addToConcern(lField, feature);
+							}
+							for (IMethod lMethod : lMethods) {
+								addToConcern(lMethod, feature);
+							}
+						} else {
+							// The element is not supported by ConcernMapper
+						}
+					}
+				}
+			}
+
+		} catch (JavaModelException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 
 	/**
 	 * @param cm
 	 */
-	private void createFile(ConcernModel cm) {
-		ModelWriter mw = new ModelWriter(cm);
+	private void createFile() {
 		IFile lFile = null;
-		
+
+		// pede o nome e lugar para salvar o arquivo .cm
 		SelectPathDialog lDialog = new SelectPathDialog(PlatformUI
 				.getWorkbench().getActiveWorkbenchWindow().getShell());
 
@@ -146,6 +185,7 @@ public class SaveCoverageAsCMAction extends Action {
 		IWorkspace lWorkspace = ResourcesPlugin.getWorkspace();
 		lFile = lWorkspace.getRoot().getFile(lPath);
 
+		// cria o arquivo
 		if (!lFile.exists()) {
 			try {
 				lFile.create(null, true, null);
@@ -163,9 +203,9 @@ public class SaveCoverageAsCMAction extends Action {
 			}
 		}
 
+		// escreve no arquivo
 		try {
-//			Test2FeatureMapper.getDefault().setDefaultResource(lFile);
-			ModelWriter lWriter = new ModelWriter(cm);
+			ModelWriter lWriter = new ModelWriter(concernModel);
 			lWriter.write(lFile);
 		} catch (ModelIOException lException) {
 			MessageDialog
@@ -180,11 +220,118 @@ public class SaveCoverageAsCMAction extends Action {
 			return;
 		}
 
-//		TODO criar uma dirty para só ativar o criar cm depois de rodar os testes
-//		Test2FeatureMapper.getDefault().resetDirty();
-//		if (aView != null) {
-//			aView.updateActionState();
-//		}
+		// TODO criar uma dirty para só ativar o criar cm depois de rodar os
+		// testes
+		// Test2FeatureMapper.getDefault().resetDirty();
+		// if (aView != null) {
+		// aView.updateActionState();
+		// }
+	}
+
+	/**
+	 * Determines if pElement can be included in a concern model.
+	 * 
+	 * @param pElement
+	 *            The element to test
+	 * @return true if pElement is of a type that is supported by the concern
+	 *         model.
+	 */
+
+	private boolean supportedElement(IJavaElement pElement) {
+		boolean lReturn = false;
+		if ((pElement instanceof IField) || (pElement instanceof IMethod)) {
+			try {
+				if (((IMember) pElement).getDeclaringType().isAnonymous()
+						|| ((IMember) pElement).getDeclaringType().isLocal()) {
+					lReturn = false;
+				} else {
+					lReturn = true;
+				}
+			} catch (JavaModelException lException) {
+				ProblemManager.reportException(lException);
+				lReturn = false;
+			}
+		}
+		return lReturn;
+	}
+
+	/**
+	 * Determines if pElement is a class or an interface which elements are to
+	 * be put into the concern model.
+	 * 
+	 * @param pElement
+	 *            The element to test
+	 * @return true if pElement is a class or an interface
+	 * 
+	 */
+
+	private boolean supportedType(IJavaElement pElement) {
+		boolean lReturn = false;
+		if (pElement instanceof IType) {
+			lReturn = true;
+			try {
+				if (((IType) pElement).isAnonymous()
+						|| ((IType) pElement).isLocal()) {
+					lReturn = false;
+				} else {
+					lReturn = true;
+				}
+			} catch (JavaModelException lException) {
+				ProblemManager.reportException(lException);
+				lReturn = false;
+			}
+		}
+		return lReturn;
+	}
+
+	/**
+	 * Parses and returns the fields of IType element.
+	 * 
+	 * @param pElement
+	 *            The element whose fields are to be obtained
+	 */
+	private IField[] returnFields(IType pElement) {
+		IField[] lReturn = null;
+		try {
+			lReturn = pElement.getFields();
+		} catch (JavaModelException lException) {
+			ProblemManager.reportException(lException);
+		}
+
+		return lReturn;
+	}
+
+	/**
+	 * Parses and returns the methods of IType element.
+	 * 
+	 * @param pElement
+	 *            The element whose methods are to be obtained
+	 */
+	private IMethod[] returnMethods(IType pElement) {
+		IMethod[] lReturn = null;
+		try {
+			lReturn = pElement.getMethods();
+		} catch (JavaModelException lException) {
+			ProblemManager.reportException(lException);
+		}
+
+		return lReturn;
+	}
+
+	/**
+	 * Adds the element to an identified concern.
+	 * 
+	 * @param pElement
+	 *            The element we want to add into the concern model pConcern The
+	 *            string-identified concern we want to augment
+	 */
+	private void addToConcern(IJavaElement pElement, String pConcern) {
+		if (!concernModel.exists(pConcern)) {
+			concernModel.newConcern(pConcern);
+		}
+		if (!concernModel.exists(pConcern, pElement)) {
+			concernModel.addElement(pConcern, pElement, 0);
+		}
 	}
 
 	private static IPath addCMFileExtension(IPath pPath) {
@@ -201,20 +348,23 @@ public class SaveCoverageAsCMAction extends Action {
 		return lReturn;
 	}
 
-	private void printProjectInfo(IProject project) throws CoreException,
-			JavaModelException {
-		System.out.println("Working in project " + project.getName());
-		// Check if we have a Java project
-		if (project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
-			IJavaProject javaProject = JavaCore.create(project);
-			printPackageInfos(javaProject);
-		}
-	}
-
 	private void printPackageInfos(IJavaProject javaProject)
 			throws JavaModelException {
 		IPackageFragment[] packages = javaProject.getPackageFragments();
 		for (IPackageFragment mypackage : packages) {
+			boolean isSourcePackage = false;
+			String[] segments = mypackage
+					.getAncestor(IJavaElement.PACKAGE_FRAGMENT).getPath()
+					.segments();
+			for (int i = 0; i < segments.length; i++) {
+				if (segments[i].contains("src")) {
+					isSourcePackage = true;
+				}
+			}
+
+			if (!isSourcePackage) {
+				break;
+			}
 			// Package fragments include all packages in the
 			// classpath
 			// We will only look at the package from the source
@@ -224,10 +374,18 @@ public class SaveCoverageAsCMAction extends Action {
 			if (mypackage.getKind() == IPackageFragmentRoot.K_SOURCE) {
 				System.out.println("Package " + mypackage.getElementName());
 				printICompilationUnitInfo(mypackage);
-
+				addPackageToConcernModel(mypackage);
 			}
-
 		}
+	}
+
+	/**
+	 * Adiciona o pacote passado como parâmetro para o ConcernModel.
+	 * 
+	 * @param mypackage
+	 */
+	private void addPackageToConcernModel(IPackageFragment mypackage) {
+		createConcernModel("feature", mypackage);
 	}
 
 	private void printICompilationUnitInfo(IPackageFragment mypackage)
