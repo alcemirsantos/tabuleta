@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SaveAsDialog;
+import org.jacoco.core.analysis.ICoverageNode;
 
 import br.ufmg.dcc.t2fm.Test2FeatureMapper;
 import br.ufmg.dcc.t2fm.model.ConcernModel;
@@ -95,15 +96,11 @@ public class SaveCoverageAsCMAction extends Action {
 			Iterator<IPackageFragmentRoot> iterator = escopo.iterator();
 			while (iterator.hasNext()) {
 				IPackageFragmentRoot fragmentRoot = iterator.next();
-				String s = fragmentRoot.getPath().lastSegment();
-				// Loop over all projects
-				IJavaProject ipf = (IJavaProject) fragmentRoot.getParent();
-				IJavaElement[] elements;
-				System.out.println("=====================================\n"
-						+ "================START================\n"
-						+ "=====================================");
+				IJavaProject javaProject = (IJavaProject) fragmentRoot.getParent();
+				IPath aPath = javaProject.getPath();
 				try {
-					printPackageInfos(ipf);
+//					if(isSourcePath(aPath))
+						printPackageInfos(javaProject);
 				} catch (JavaModelException e) {
 					e.printStackTrace();
 				}
@@ -124,6 +121,19 @@ public class SaveCoverageAsCMAction extends Action {
 		// TODO matar sessão de cobertura
 	}
 
+	/**
+	 * testa se é um pacote de source
+	 * @param aPath
+	 */
+	private boolean isSourcePath(IPath aPath) {
+		for (int i = 0; i < aPath.segments().length; i++) {
+			if (aPath.segment(i).contains("src")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private void createConcernModel(String feature, IPackageFragment mypackage) {
 
 		IJavaElement[] packageElements;
@@ -137,19 +147,39 @@ public class SaveCoverageAsCMAction extends Action {
 					packageElements = unit.getChildren();
 					for (int i = 0; i < packageElements.length; i++) {
 						IJavaElement lNext = packageElements[i];
+						ICoverageNode node;
 						if (supportedElement(lNext)) {
-							addToConcern(lNext, feature);
+							node = (ICoverageNode) lNext.getAdapter(ICoverageNode.class);
+							if (node!=null) {
+								double ratio = node.getLineCounter().getCoveredRatio();
+								System.out.println(node.getName()+": "+ratio);
+								if( ratio > 0.5)
+									addToConcern(lNext, feature);
+							}
 						}
 						// if it is a class or interface, get its members
 						// and add them to the concern
 						else if (supportedType(lNext)) {
 							final IField[] lFields = returnFields((IType) lNext);
 							final IMethod[] lMethods = returnMethods((IType) lNext);
+							
 							for (IField lField : lFields) {
-								addToConcern(lField, feature);
+								node = (ICoverageNode) lField.getAdapter(ICoverageNode.class);
+								if (node!=null) {
+									double ratio = node.getLineCounter().getCoveredRatio();
+									System.out.println(node.getName()+": "+ratio);
+									if( ratio > 0.5)
+										addToConcern(lField, feature);
+								}
 							}
 							for (IMethod lMethod : lMethods) {
-								addToConcern(lMethod, feature);
+								node = (ICoverageNode) lMethod.getAdapter(ICoverageNode.class);
+								if (node!=null) {
+									double ratio = node.getLineCounter().getCoveredRatio();
+									System.out.println(node.getName()+": "+ratio);
+									if( ratio > 0.5)
+										addToConcern(lMethod, feature);
+								}
 							}
 						} else {
 							// The element is not supported by ConcernMapper
@@ -352,17 +382,8 @@ public class SaveCoverageAsCMAction extends Action {
 			throws JavaModelException {
 		IPackageFragment[] packages = javaProject.getPackageFragments();
 		for (IPackageFragment mypackage : packages) {
-			boolean isSourcePackage = false;
-			String[] segments = mypackage
-					.getAncestor(IJavaElement.PACKAGE_FRAGMENT).getPath()
-					.segments();
-			for (int i = 0; i < segments.length; i++) {
-				if (segments[i].contains("src")) {
-					isSourcePackage = true;
-				}
-			}
 
-			if (!isSourcePackage) {
+			if (!isSourcePath( mypackage.getAncestor(IJavaElement.PACKAGE_FRAGMENT).getPath())) {
 				break;
 			}
 			// Package fragments include all packages in the
@@ -373,7 +394,6 @@ public class SaveCoverageAsCMAction extends Action {
 			// rt.jar
 			if (mypackage.getKind() == IPackageFragmentRoot.K_SOURCE) {
 				System.out.println("Package " + mypackage.getElementName());
-				printICompilationUnitInfo(mypackage);
 				addPackageToConcernModel(mypackage);
 			}
 		}
@@ -386,40 +406,6 @@ public class SaveCoverageAsCMAction extends Action {
 	 */
 	private void addPackageToConcernModel(IPackageFragment mypackage) {
 		createConcernModel("feature", mypackage);
-	}
-
-	private void printICompilationUnitInfo(IPackageFragment mypackage)
-			throws JavaModelException {
-		for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
-			printCompilationUnitDetails(unit);
-
-		}
-	}
-
-	private void printIMethods(ICompilationUnit unit) throws JavaModelException {
-		IType[] allTypes = unit.getAllTypes();
-		for (IType type : allTypes) {
-			printIMethodDetails(type);
-		}
-	}
-
-	private void printCompilationUnitDetails(ICompilationUnit unit)
-			throws JavaModelException {
-		System.out.println("Source file " + unit.getElementName());
-		Document doc = new Document(unit.getSource());
-		System.out.println("Has number of lines: " + doc.getNumberOfLines());
-		printIMethods(unit);
-	}
-
-	private void printIMethodDetails(IType type) throws JavaModelException {
-		IMethod[] methods = type.getMethods();
-		for (IMethod method : methods) {
-
-			System.out.println("Method name " + method.getElementName());
-			System.out.println("Signature " + method.getSignature());
-			System.out.println("Return Type " + method.getReturnType());
-
-		}
 	}
 
 	class SelectPathDialog extends SaveAsDialog {
