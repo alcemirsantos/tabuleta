@@ -70,8 +70,7 @@ public class SaveCoverageAsCMAction extends Action {
 		this.aView = mapView;
 		setText("Save Coverage into a cm File");
 		setToolTipText("Save Coverage into a cm File");
-		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
+		setImageDescriptor( Test2FeatureMapper.imageDescriptorFromPlugin( Test2FeatureMapper.ID_PLUGIN, "icons/coverage2cm.png"));
 		concernModel = new ConcernModel();
 	}
 
@@ -100,27 +99,25 @@ public class SaveCoverageAsCMAction extends Action {
 				IPath aPath = javaProject.getPath();
 				try {
 //					if(isSourcePath(aPath))
-						printPackageInfos(javaProject);
+						selectPackagesToModel(javaProject);
 				} catch (JavaModelException e) {
 					e.printStackTrace();
 				}
-				/**
-				 * criar um concernmodel com o que foi coberto [igual ao
-				 * listener interno do AddToConcernAction];
-				 */
-				// CoverageTools.getCoverageInfo(object);
-				// ICoverageNode coverage = (ICoverageNode)
-				// someJavaElement.getAdapter(ICoverageNode.class);
 			}
 
+			createFile();
+			// TODO matar sessão de cobertura
+
+		}else{
+			showMessage("You must run the generated suite test class with EclEmma coverage tool.");
 		}
 
-		// TODO escrever no cm file;
-		createFile();
-
-		// TODO matar sessão de cobertura
 	}
 
+	private void showMessage(String message) {
+		MessageDialog.openInformation(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Test2FeatureMapper View", message);
+	}
+	
 	/**
 	 * testa se é um pacote de source
 	 * @param aPath
@@ -137,8 +134,8 @@ public class SaveCoverageAsCMAction extends Action {
 	private void createConcernModel(String feature, IPackageFragment mypackage) {
 
 		IJavaElement[] packageElements;
-
 		ICompilationUnit[] units;
+		double threshold = 0.5;
 		try {
 			units = mypackage.getCompilationUnits();
 
@@ -153,8 +150,8 @@ public class SaveCoverageAsCMAction extends Action {
 							if (node!=null) {
 								double ratio = node.getLineCounter().getCoveredRatio();
 								System.out.println(node.getName()+": "+ratio);
-								if( ratio > 0.5)
-									addToConcern(lNext, feature);
+								if( ratio >= threshold)
+									addToConcern(lNext, feature, (int)Math.ceil(ratio*100));
 							}
 						}
 						// if it is a class or interface, get its members
@@ -168,8 +165,8 @@ public class SaveCoverageAsCMAction extends Action {
 								if (node!=null) {
 									double ratio = node.getLineCounter().getCoveredRatio();
 									System.out.println(node.getName()+": "+ratio);
-									if( ratio > 0.5)
-										addToConcern(lField, feature);
+									if( ratio >= threshold)
+										addToConcern(lField, feature, (int)Math.ceil(ratio*100));
 								}
 							}
 							for (IMethod lMethod : lMethods) {
@@ -177,8 +174,8 @@ public class SaveCoverageAsCMAction extends Action {
 								if (node!=null) {
 									double ratio = node.getLineCounter().getCoveredRatio();
 									System.out.println(node.getName()+": "+ratio);
-									if( ratio > 0.5)
-										addToConcern(lMethod, feature);
+									if( ratio >= threshold)
+										addToConcern(lMethod, feature, (int)Math.ceil(ratio*100));
 								}
 							}
 						} else {
@@ -355,12 +352,12 @@ public class SaveCoverageAsCMAction extends Action {
 	 *            The element we want to add into the concern model pConcern The
 	 *            string-identified concern we want to augment
 	 */
-	private void addToConcern(IJavaElement pElement, String pConcern) {
+	private void addToConcern(IJavaElement pElement, String pConcern, int degree) {
 		if (!concernModel.exists(pConcern)) {
 			concernModel.newConcern(pConcern);
 		}
 		if (!concernModel.exists(pConcern, pElement)) {
-			concernModel.addElement(pConcern, pElement, 0);
+			concernModel.addElement(pConcern, pElement, degree);
 		}
 	}
 
@@ -378,7 +375,7 @@ public class SaveCoverageAsCMAction extends Action {
 		return lReturn;
 	}
 
-	private void printPackageInfos(IJavaProject javaProject)
+	private void selectPackagesToModel(IJavaProject javaProject)
 			throws JavaModelException {
 		IPackageFragment[] packages = javaProject.getPackageFragments();
 		for (IPackageFragment mypackage : packages) {
@@ -432,9 +429,9 @@ public class SaveCoverageAsCMAction extends Action {
 			Control lContents = super.createContents(pParent);
 
 			setTitle(Test2FeatureMapper
-					.getResourceString("actions.GenerateTestSuiteAction.DialogTitle"));
+					.getResourceString("actions.SaveCoverageAsCMAction.DialogTitle"));
 			setMessage(Test2FeatureMapper
-					.getResourceString("actions.GenerateTestSuiteAction.DialogMessage"));
+					.getResourceString("actions.SaveCoverageAsCMAction.DialogMessage"));
 
 			return lContents;
 		}

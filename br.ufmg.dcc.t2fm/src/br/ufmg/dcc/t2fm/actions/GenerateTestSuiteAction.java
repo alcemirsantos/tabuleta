@@ -51,7 +51,7 @@ public class GenerateTestSuiteAction extends Action {
 		aView = pView;
 		setText("Generate Test Suite");
 		setToolTipText("Generate Test Suite Action");
-		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+		setImageDescriptor( Test2FeatureMapper.imageDescriptorFromPlugin( Test2FeatureMapper.ID_PLUGIN, "icons/generateJU.png"));
 	}
 	
 	public void run()  {
