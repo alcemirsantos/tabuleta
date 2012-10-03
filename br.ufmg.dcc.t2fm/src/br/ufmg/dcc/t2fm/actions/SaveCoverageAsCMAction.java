@@ -165,7 +165,7 @@ public class SaveCoverageAsCMAction extends Action {
 								if (node!=null) {
 									double ratio = node.getLineCounter().getCoveredRatio();
 									System.out.println(node.getName()+": "+ratio);
-									if( ratio >= threshold)
+//									if( ratio >= threshold)
 										addToConcern(lField, feature, (int)Math.ceil(ratio*100));
 								}
 							}

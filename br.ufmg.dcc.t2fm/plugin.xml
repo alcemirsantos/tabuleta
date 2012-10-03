@@ -101,8 +101,14 @@ http://www.eclipse.org/legal/epl-v10.html
          point="org.eclipse.ui.preferencePages">
       <page
             name="Test2Feature Mapper"
+            class="br.ufmg.dcc.t2fm.ui.Test2FeatureMapperPreferencePage"
+            id="br.ufmg.dcc.t2fm.Test2FeatureMapperPreferencePage">
+      </page>
+      <page
+            name="ConcernMapper"
             class="br.ufmg.dcc.t2fm.ui.ConcernMapperPreferencePage"
-            id="br.ufmg.dcc.t2fm.ConcernMapperPreferencePage">
+            id="br.ufmg.dcc.t2fm.ConcernMapperPreferencePage"
+            category="br.ufmg.dcc.t2fm.Test2FeatureMapperPreferencePage">
       </page>
    </extension>
    <extension 
