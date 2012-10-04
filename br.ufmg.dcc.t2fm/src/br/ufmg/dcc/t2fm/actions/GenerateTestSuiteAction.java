@@ -104,7 +104,6 @@ public class GenerateTestSuiteAction extends Action {
 			IFile file =  ResourcesPlugin.getWorkspace().getRoot().getFileForLocation( aPath );
 			if (file != null ) {
 				lPath = trunkPath(file.getLocation(), s);
-				
 			}else{
 				showMessage("We are not able to find the path to tests files. You can set it on the preference page.");
 				return;

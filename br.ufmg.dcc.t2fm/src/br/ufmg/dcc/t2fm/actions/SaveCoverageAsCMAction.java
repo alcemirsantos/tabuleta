@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
@@ -33,6 +34,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -49,6 +52,7 @@ import br.ufmg.dcc.t2fm.model.io.ModelWriter;
 import br.ufmg.dcc.t2fm.ui.ConcernMapperPreferencePage;
 import br.ufmg.dcc.t2fm.ui.ProblemManager;
 import br.ufmg.dcc.t2fm.views.MapView;
+import br.ufmg.dcc.t2fm.views.components.ConcernNode;
 
 import com.mountainminds.eclemma.core.CoverageTools;
 import com.mountainminds.eclemma.core.ICoverageSession;
@@ -62,6 +66,7 @@ public class SaveCoverageAsCMAction extends Action {
 
 	private MapView aView;
 	private ConcernModel concernModel;
+	private String selectedFeature;
 
 	/**
 	 * @param mapView
@@ -76,6 +81,18 @@ public class SaveCoverageAsCMAction extends Action {
 
 	public void run() {
 		boolean thereIsActiveCoverageSession = false;
+		if (aView.getCurrentSelection().isEmpty()) {
+			showMessage("You must select a feature.");
+			return;
+		}else{
+			ISelection iss = aView.getCurrentSelection();
+			ConcernNode cn;
+			if (iss instanceof TreeSelection) {
+				TreeSelection ts = (TreeSelection) iss;
+				cn = (ConcernNode)ts.getFirstElement();
+				selectedFeature = cn.getConcernName();
+			}
+		}
 		ICoverageSession activeSession = CoverageTools.getSessionManager()
 				.getActiveSession();
 		thereIsActiveCoverageSession = activeSession == null ? false : true;
@@ -90,7 +107,7 @@ public class SaveCoverageAsCMAction extends Action {
 			} catch (JavaModelException e) {
 				e.printStackTrace();
 			}
-
+			
 			// && e se o elemento está no escopo
 			Iterator<IPackageFragmentRoot> iterator = escopo.iterator();
 			while (iterator.hasNext()) {
@@ -109,7 +126,8 @@ public class SaveCoverageAsCMAction extends Action {
 			// TODO matar sessão de cobertura
 
 		}else{
-			showMessage("You must run the generated suite test class with EclEmma coverage tool.");
+			showMessage("You must run the generated suite test class with EclEmma " +
+					"coverage tool before save the .cm file.");
 		}
 
 	}
@@ -186,7 +204,6 @@ public class SaveCoverageAsCMAction extends Action {
 			}
 
 		} catch (JavaModelException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
@@ -196,20 +213,47 @@ public class SaveCoverageAsCMAction extends Action {
 	 */
 	private void createFile() {
 		IFile lFile = null;
-
+		IPath lPath = null;
+		
 		// pede o nome e lugar para salvar o arquivo .cm
-		SelectPathDialog lDialog = new SelectPathDialog(PlatformUI
-				.getWorkbench().getActiveWorkbenchWindow().getShell());
-
-		lDialog.open();
-
-		if (lDialog.getReturnCode() == Window.CANCEL) {
+//		SelectPathDialog lDialog = new SelectPathDialog(PlatformUI
+//				.getWorkbench().getActiveWorkbenchWindow().getShell());
+//
+//		lDialog.open();
+//
+//		if (lDialog.getReturnCode() == Window.CANCEL) {
+//			return;
+//		}
+//		
+//		IPath lPath = lDialog.getResult();
+		
+		if (selectedFeature==null || selectedFeature.isEmpty()) {
+			showMessage("You must select a feature.");
 			return;
 		}
-		IPath lPath = lDialog.getResult();
+		
+		IWorkspace lWorkspace = ResourcesPlugin.getWorkspace();
+		IPath s = lWorkspace.getRoot().getLocation();
+		
+		String cmPath = Test2FeatureMapper.getDefault().getPreferenceStore().getString("CMPATH");
+		if (cmPath==null || cmPath.isEmpty()) {
+			showMessage("You must set the path to .cm files on the Test2FeatureMapper preference page.");
+			return;
+		}else{
+			Path aPath = new Path(cmPath);
+			// find file in workspace
+			IFile file =  ResourcesPlugin.getWorkspace().getRoot().getFileForLocation( aPath );
+			if (file != null ) {
+				lPath = trunkPath(file.getLocation(), s ).append("CM"+selectedFeature);
+			}else{
+				showMessage("We are not able to find the path to .cm files. You can set it on the preference page.");
+				return;
+			}
+		}
+		
+		//
 		lPath = addCMFileExtension(lPath);
 
-		IWorkspace lWorkspace = ResourcesPlugin.getWorkspace();
 		lFile = lWorkspace.getRoot().getFile(lPath);
 
 		// cria o arquivo
@@ -255,6 +299,11 @@ public class SaveCoverageAsCMAction extends Action {
 		// }
 	}
 
+	private IPath trunkPath(IPath path, IPath with){
+		int i = path.matchingFirstSegments(with);		
+		return path.removeFirstSegments(i);
+	}
+	
 	/**
 	 * Determines if pElement can be included in a concern model.
 	 * 
@@ -402,7 +451,7 @@ public class SaveCoverageAsCMAction extends Action {
 	 * @param mypackage
 	 */
 	private void addPackageToConcernModel(IPackageFragment mypackage) {
-		createConcernModel("feature", mypackage);
+		createConcernModel(selectedFeature, mypackage);
 	}
 
 	class SelectPathDialog extends SaveAsDialog {
