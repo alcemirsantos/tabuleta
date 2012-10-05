@@ -149,64 +149,6 @@ public class SaveCoverageAsCMAction extends Action {
 		return false;
 	}
 
-	private void createConcernModel(String feature, IPackageFragment mypackage) {
-
-		IJavaElement[] packageElements;
-		ICompilationUnit[] units;
-		double threshold = 0.5;
-		try {
-			units = mypackage.getCompilationUnits();
-
-			for (ICompilationUnit unit : units) {
-				if (mypackage.hasChildren()) {
-					packageElements = unit.getChildren();
-					for (int i = 0; i < packageElements.length; i++) {
-						IJavaElement lNext = packageElements[i];
-						ICoverageNode node;
-						if (supportedElement(lNext)) {
-							node = (ICoverageNode) lNext.getAdapter(ICoverageNode.class);
-							if (node!=null) {
-								double ratio = node.getLineCounter().getCoveredRatio();
-								System.out.println(node.getName()+": "+ratio);
-								if( ratio >= threshold)
-									addToConcern(lNext, feature, (int)Math.ceil(ratio*100));
-							}
-						}
-						// if it is a class or interface, get its members
-						// and add them to the concern
-						else if (supportedType(lNext)) {
-							final IField[] lFields = returnFields((IType) lNext);
-							final IMethod[] lMethods = returnMethods((IType) lNext);
-							
-							for (IField lField : lFields) {
-								node = (ICoverageNode) lField.getAdapter(ICoverageNode.class);
-								if (node!=null) {
-									double ratio = node.getLineCounter().getCoveredRatio();
-									System.out.println(node.getName()+": "+ratio);
-//									if( ratio >= threshold)
-										addToConcern(lField, feature, (int)Math.ceil(ratio*100));
-								}
-							}
-							for (IMethod lMethod : lMethods) {
-								node = (ICoverageNode) lMethod.getAdapter(ICoverageNode.class);
-								if (node!=null) {
-									double ratio = node.getLineCounter().getCoveredRatio();
-									System.out.println(node.getName()+": "+ratio);
-									if( ratio >= threshold)
-										addToConcern(lMethod, feature, (int)Math.ceil(ratio*100));
-								}
-							}
-						} else {
-							// The element is not supported by ConcernMapper
-						}
-					}
-				}
-			}
-
-		} catch (JavaModelException e1) {
-			e1.printStackTrace();
-		}
-	}
 
 	/**
 	 * @param cm
@@ -228,7 +170,7 @@ public class SaveCoverageAsCMAction extends Action {
 //		IPath lPath = lDialog.getResult();
 		
 		if (selectedFeature==null || selectedFeature.isEmpty()) {
-			showMessage("You must select a feature.");
+			showMessage("You must select a feature.\n Reminder: The .cm file that is going to be saved is related to the lastest coverage session active.");
 			return;
 		}
 		
@@ -452,6 +394,70 @@ public class SaveCoverageAsCMAction extends Action {
 	 */
 	private void addPackageToConcernModel(IPackageFragment mypackage) {
 		createConcernModel(selectedFeature, mypackage);
+	}
+	
+	/**
+	 * Cria o <code>ConcernModel</code> a ser escrito no arquivo cm. 
+	 * 
+	 */
+	private void createConcernModel(String feature, IPackageFragment mypackage) {
+		
+		IJavaElement[] packageElements;
+		ICompilationUnit[] units;
+		double threshold = 0.5;
+		try {
+			units = mypackage.getCompilationUnits();
+			
+			for (ICompilationUnit unit : units) {
+				if (mypackage.hasChildren()) {
+					packageElements = unit.getChildren();
+					for (int i = 0; i < packageElements.length; i++) {
+						IJavaElement lNext = packageElements[i];
+						ICoverageNode node;
+						if (supportedElement(lNext)) {
+							node = (ICoverageNode) lNext.getAdapter(ICoverageNode.class);
+							if (node!=null) {
+								double ratio = node.getLineCounter().getCoveredRatio();
+								System.out.println(node.getName()+": "+ratio);
+								if( ratio >= threshold)
+									addToConcern(lNext, feature, (int)Math.ceil(ratio*100));
+							}
+						}
+						// if it is a class or interface, get its members
+						// and add them to the concern
+						else if (supportedType(lNext)) {
+							final IField[] lFields = returnFields((IType) lNext);
+							final IMethod[] lMethods = returnMethods((IType) lNext);
+							
+							for (IField lField : lFields) {
+								node = (ICoverageNode) lField.getAdapter(ICoverageNode.class);
+//								if (node!=null) {
+//									double ratio = node.getLineCounter().getCoveredRatio();
+//									System.out.println(node.getName()+": "+ratio);
+//									if( ratio >= threshold)
+//									addToConcern(lField, feature, (int)Math.ceil(ratio*100));
+//								}
+								addToConcern(lField, feature, 100);
+							}
+							for (IMethod lMethod : lMethods) {
+								node = (ICoverageNode) lMethod.getAdapter(ICoverageNode.class);
+								if (node!=null) {
+									double ratio = node.getLineCounter().getCoveredRatio();
+									System.out.println(node.getName()+": "+ratio);
+									if( ratio >= threshold)
+										addToConcern(lMethod, feature, (int)Math.ceil(ratio*100));
+								}
+							}
+						} else {
+							// The element is not supported by ConcernMapper
+						}
+					}
+				}
+			}
+			
+		} catch (JavaModelException e1) {
+			e1.printStackTrace();
+		}
 	}
 
 	class SelectPathDialog extends SaveAsDialog {
