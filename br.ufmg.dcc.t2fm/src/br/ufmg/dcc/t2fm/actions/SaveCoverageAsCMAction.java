@@ -76,10 +76,10 @@ public class SaveCoverageAsCMAction extends Action {
 		setText("Save Coverage into a cm File");
 		setToolTipText("Save Coverage into a cm File");
 		setImageDescriptor( Test2FeatureMapper.imageDescriptorFromPlugin( Test2FeatureMapper.ID_PLUGIN, "icons/coverage2cm.png"));
-		concernModel = new ConcernModel();
 	}
 
 	public void run() {
+		concernModel = new ConcernModel();
 		boolean thereIsActiveCoverageSession = false;
 		if (aView.getCurrentSelection().isEmpty()) {
 			showMessage("You must select a feature.");
