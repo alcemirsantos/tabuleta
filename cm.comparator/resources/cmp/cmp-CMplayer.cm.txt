@@ -1,0 +1,3 @@
+Esta no oracle e no test:			20
+Esta no oracle e nao esta no test:	32
+Esta no test e nao esta no oracle:	118
