@@ -16,15 +16,31 @@ http://www.eclipse.org/legal/epl-v10.html
    <extension
          point="org.eclipse.ui.views">
       <category
-            name="Test2Feature Mapper"
+            name="TaBuLeTa"
             id="br.ufmg.dcc.t2fm">
       </category>
       <view
-            name="T2FMapping View"
+            name="T2FMapping"
             icon="icons/sample.gif"
             category="br.ufmg.dcc.t2fm"
             class="br.ufmg.dcc.t2fm.views.MapView"
             id="br.ufmg.dcc.t2fm.views.MapView">
+      </view>
+      <view
+            category="br.ufmg.dcc.t2fm"
+            class="br.ufmg.dcc.t2fm.views.CMFilesView"
+            icon="icons/sample.gif"
+            id="br.ufmg.dcc.t2fm.views.CMFilesView"
+            name="TaBuLeTa Files"
+            restorable="true">
+      </view>
+      <view
+            category="br.ufmg.dcc.t2fm"
+            class="br.ufmg.dcc.t2fm.views.MetricsView"
+            icon="icons/sample.gif"
+            id="br.ufmg.dcc.t2fm.views.MetricsView"
+            name="Metrics"
+            restorable="true">
       </view>
    </extension>
    
