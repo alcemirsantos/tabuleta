@@ -93,6 +93,33 @@ http://www.eclipse.org/legal/epl-v10.html
                menubarPath="additions"
                style="pulldown"/>
       </viewerContribution>
+      <objectContribution
+            adaptable="true"
+            id="br.ufmg.dcc.t2fm.doIntersection"
+            nameFilter="*.cm"
+            objectClass="org.eclipse.core.resources.IResource">
+            <menu 
+            		label = "TaBuLeTa"
+            		path = "additions"
+            		id = "br.ufmg.dcc.t2fm.tabuleta.additions.menu">
+            	<groupMarker
+                   name="content">
+            	</groupMarker>
+            	<separator
+                   name="additions">
+            	</separator>
+            </menu>
+            <action
+                  id="br.ufmg.dcc.t2fm.doIntersection"
+                  label="Do Intersection"
+                  icon="icons/sample.gif"
+                  tooltip="Do intersection between .cm files."
+                  menubarPath="br.ufmg.dcc.t2fm.tabuleta.additions.menu/content"
+                  enablesFor="2+"
+                  class="br.ufmg.dcc.t2fm.actions.DoIntersectionAction">
+            </action>
+            
+      </objectContribution>
    </extension>
    
    <extension
