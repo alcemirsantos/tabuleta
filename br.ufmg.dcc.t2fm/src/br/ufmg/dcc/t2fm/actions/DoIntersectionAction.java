@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,11 +40,13 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -52,7 +55,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import br.ufmg.dcc.t2fm.Test2FeatureMapper;
-import br.ufmg.dcc.t2fm.views.components.ConcernNode;
 
 /**
  * @author Alcemir R. Santos
@@ -70,18 +72,18 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 	@Override
 	public void run(IAction action) {
 		CM_PATH = Test2FeatureMapper.getDefault().getPreferenceStore().getString("CMPATH");
+		if (CM_PATH.isEmpty()) {
+			showMessage("You must set the path to .cm files on the Test2FeatureMapper preference page.");
+			return;
+		}		
 		String[] files=null;
-
 		
 		IStructuredSelection isSelection = null;
 		if (selection instanceof IStructuredSelection) {
 			isSelection = (IStructuredSelection) selection;
 		}
 		if (isSelection == null){
-			MessageDialog.openInformation(
-					targetPart.getSite().getShell(),
-					"Do Intersection Action",
-					"Triggered the none selection");
+			showMessage("Triggered \"Do Intersection\" with none selection");
 			return;
 		}else{
 			files = new String[isSelection.size()];
@@ -93,10 +95,68 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 				i++;
 			}
 		}
-		// TODO pegar o concern a fazer a intersecção intersecção
+		Set<String> concerns = null;
+		try {
+			concerns = getCMConcernNames(files);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		String concern = null;
+	    if(concerns.isEmpty()){
+	    	showMessage("Triggered \"Do Intersection\" with .cm files with no concerns.");
+			return;
+	    }else if (concerns.size()==1) {
+			concern = (String) concerns.toArray()[0];
+		}else{
+			concern = askByConcern(concerns.toArray());
+		}
 		doIntersection(files, concern);
 
+	}
+
+	/**
+	 * Pergunta ao usuário qual o concern deve ser considerado para a intersecção.
+	 *  lista de opções preparada a partir o vetor passado como parâmetro.
+	 *  
+	 * @param concerns
+	 * @return
+	 */
+	private String askByConcern(Object[] concerns){
+		ElementListSelectionDialog dialog = 
+				new ElementListSelectionDialog(
+						Display.getCurrent().getActiveShell(),
+						new LabelProvider());
+		
+		dialog.setElements(concerns);
+		dialog.setTitle("What Concern do you want to do interserction?");
+		if (dialog.open() != Window.OK) {
+		    return null;
+		}
+		Object[] result = dialog.getResult();
+		return (String)result[0];
+	}
+	
+	/**
+	 * @param files
+	 * @return
+	 * @throws Exception 
+	 */
+	private Set<String> getCMConcernNames(String[] files) throws Exception {
+		Set<String> concerns = new TreeSet<String>();
+		Document doc;
+		for (int j = 0; j < files.length; j++) {
+			doc = getDocument(files[j]);
+			NodeList tConcernsList = doc.getElementsByTagName("concern");				
+			
+			for (int i=0; i<tConcernsList.getLength(); i++) {
+				Node concernNode = tConcernsList.item(i);
+				if (concernNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element eElement = (Element) concernNode;
+					concerns.add( eElement.getAttribute("name") );					
+				}
+			}
+		}
+		return concerns;
 	}
 
 	/**
@@ -136,7 +196,9 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 	}
 	
 	/**
-	 * retorna uma lista de elementos dentro;
+	 * retorna uma lista de elementos <code>&lt;element&gt;</code> dentro da tag <code>&lt;concern&gt;</code> 
+	 *  especificado pelo parâmetro <code>concernName</code>. Caso o concern não seja especificado retorna lista 
+	 *  de todos os elementos encontrados.
 	 * @param doc
 	 * @return
 	 */
@@ -179,7 +241,7 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 	}
 	
 	/**
-	 * faz a intersecção de arquivos .cm contidos no vetor passado como parâmetro.
+	 * Faz a intersecção de arquivos .cm contidos no vetor passado como parâmetro.
 	 * 
 	 *  OBSERVAÇÃO: setar concern caso tenha mais de um concern no <code>.cm</code>.
 	 * 
@@ -211,11 +273,8 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 		for (ArrayList<CMElement> arrayList : conjunto) {
 			intersectionElements.retainAll(arrayList);			
 		}
-		
-//		for (CMElement concernElement : intersectionElements) {
-//			System.out.println(concernElement.toString());
-//		}
-		buildCMFile(concern, intersectionElements);
+				
+		writeToCMFile(concern, buildCMFile(concern, intersectionElements));
 	}
 	
 	/**
@@ -256,7 +315,7 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 	 * @param concernElements
 	 */
 	@SuppressWarnings("unchecked")
-	public void buildCMFile(String concern, List<CMElement> concernElements){
+	public String buildCMFile(String concern, List<CMElement> concernElements){
 		String cmString;
 		String header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>";
 		String openModel = "<model>";
@@ -277,8 +336,7 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 		System.out.println(closeModel);
 		
 		cmString += closeConcern+closeModel;
-		
-		writeToCMFile(concern, cmString);
+		return cmString;		
 	}
 	
 	/**
@@ -293,7 +351,7 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 				try {
 					transformer = transformerFactory.newTransformer();
 					DOMSource source = new DOMSource(stringToDom(xml));
-					StreamResult result = new StreamResult(new File(CM_PATH+concern+"CM-intersection.cm"));
+					StreamResult result = new StreamResult(new File(CM_PATH+File.separator+concern+"CM-intersection.cm"));
 					
 					transformer.transform(source, result);
 					
@@ -318,6 +376,16 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 	    return builder.parse(new InputSource(new StringReader(xmlSource)));
 	}
 	
+	/**
+	 * Mosta um diálogo de informação com a <code>String</code> informada.
+	 * @param message
+	 */	
+	private void showMessage(String message) {
+		MessageDialog.openInformation(
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+				"Do Intersection Action", 
+				message);
+	}
 	/**
 	 * representa a tag <code>&lt;element&gt;</code> dos arquivos .cm
 	 * @author Alcemir R. Santos
