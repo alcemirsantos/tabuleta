@@ -110,7 +110,15 @@ http://www.eclipse.org/legal/epl-v10.html
                   enablesFor="2+"
                   class="br.ufmg.dcc.t2fm.actions.DoIntersectionAction">
             </action>
-            
+            <action
+                  id="br.ufmg.dcc.t2fm.calculateMetrics"
+                  label="Calculate Metrics"
+                  icon="icons/sample.gif"
+                  tooltip="Calculate metrics from .cm files."
+                  menubarPath="br.ufmg.dcc.t2fm.tabuleta.additions.menu/content"
+                  enablesFor="2"
+                  class="br.ufmg.dcc.t2fm.actions.CalculateMetricsAction">
+            </action>
       </objectContribution>
    </extension>
    
@@ -135,7 +143,7 @@ http://www.eclipse.org/legal/epl-v10.html
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            name="Test2Feature Mapper"
+            name="TaBuLeTa"
             class="br.ufmg.dcc.t2fm.ui.Test2FeatureMapperPreferencePage"
             id="br.ufmg.dcc.t2fm.Test2FeatureMapperPreferencePage">
       </page>

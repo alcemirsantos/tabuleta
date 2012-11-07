@@ -1,5 +1,6 @@
 package br.ufmg.dcc.t2fm.views;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -10,7 +11,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 
-import br.ufmg.dcc.t2fm.views.components.MetricsContentProvider;
+import br.ufmg.dcc.t2fm.views.components.MetricsManager;
 import br.ufmg.dcc.t2fm.views.components.MetricsReport;
 
 public class MetricsView extends ViewPart {
@@ -20,12 +21,12 @@ public class MetricsView extends ViewPart {
 	 */
 	public static final String ID = "br.ufmg.dcc.t2fm.views.MetricsView";
 	
-	private TableViewer tblViewer;
+	private static TableViewer tblViewer;
 	
 	public MetricsView() {
 	}
 	
-	public TableViewer getMetricsView() {
+	public static TableViewer getMetricsView() {
 		return tblViewer;
 	}
 
@@ -35,7 +36,6 @@ public class MetricsView extends ViewPart {
 		tblViewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI | SWT.FULL_SELECTION);
 		
 		// Create the columns 
-		// Not yet implemented
 		createColumns(parent);
 
 		// Make lines and make header visible
@@ -44,22 +44,17 @@ public class MetricsView extends ViewPart {
 		table.setLinesVisible(true); 
 
 		// Set the ContentProvider
-		tblViewer.setContentProvider(MetricsContentProvider.getInstance());
+		tblViewer.setContentProvider(ArrayContentProvider.getInstance());
 
-		// Get the content for the Viewer,
-		// setInput will call getElements in the ContentProvider
-//		tblViewer.setInput(MetricsManager.getInstance().getItens()); 
-		
-//		createTableViewer(parent);
-//		createTableViewer2(parent);
-
+		// Get the content for the Viewer, setInput will call getElements in the ContentProvider
+		tblViewer.setInput(MetricsManager.getInstance().getItens()); 
 	}
 
 	/**
 	 * @param parent
 	 */
 	private void createColumns(Composite parent) {
-		 String[] titles = { "CM File", "TP", "FP", "TN", "Recall", "Precision", "F1-Score" };
+		 String[] titles = { "CM File", "TP", "FP", "FN", "Recall", "Precision", "F1-Score" };
 		    int[] bounds = { 250, 100, 100, 100, 100, 100, 100 };
 
 		    // This column is for the CM file 
@@ -69,7 +64,7 @@ public class MetricsView extends ViewPart {
 		      @Override
 		      public String getText(Object element) {
 		        MetricsReport p = (MetricsReport) element;
-		        return p.getTruePositives();
+		        return p.getFileName();
 		      }
 		    });
 		    

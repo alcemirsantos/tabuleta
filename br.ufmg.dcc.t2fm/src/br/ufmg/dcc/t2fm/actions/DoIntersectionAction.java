@@ -12,32 +12,16 @@
  *************************************************************************/
 package br.ufmg.dcc.t2fm.actions;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.TreeSet;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -45,16 +29,12 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import br.ufmg.dcc.t2fm.Test2FeatureMapper;
+import br.ufmg.dcc.t2fm.actions.util.CMElementTag;
+import br.ufmg.dcc.t2fm.actions.util.CmFilesOperations;
 
 /**
  * @author Alcemir R. Santos
@@ -73,17 +53,19 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 	public void run(IAction action) {
 		CM_PATH = Test2FeatureMapper.getDefault().getPreferenceStore().getString("CMPATH");
 		if (CM_PATH.isEmpty()) {
-			showMessage("You must set the path to .cm files on the Test2FeatureMapper preference page.");
+			CmFilesOperations.showMessage("Do Intersection Action",
+					"You must set the path to .cm files on the Test2FeatureMapper preference page.");
 			return;
 		}		
-		String[] files=null;
+		String[] files = null;
 		
 		IStructuredSelection isSelection = null;
 		if (selection instanceof IStructuredSelection) {
 			isSelection = (IStructuredSelection) selection;
 		}
 		if (isSelection == null){
-			showMessage("Triggered \"Do Intersection\" with none selection");
+			CmFilesOperations.showMessage("Do Intersection Action",
+					"Triggered \"Do Intersection\" with none selection");
 			return;
 		}else{
 			files = new String[isSelection.size()];
@@ -97,13 +79,14 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 		}
 		Set<String> concerns = null;
 		try {
-			concerns = getCMConcernNames(files);
+			concerns = CmFilesOperations.getCMConcernNames(files);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		String concern = null;
 	    if(concerns.isEmpty()){
-	    	showMessage("Triggered \"Do Intersection\" with .cm files with no concerns.");
+	    	CmFilesOperations.showMessage("Do Intersection Action",
+	    			"Triggered \"Do Intersection\" with .cm files with no concerns.");
 			return;
 	    }else if (concerns.size()==1) {
 			concern = (String) concerns.toArray()[0];
@@ -112,51 +95,6 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 		}
 		doIntersection(files, concern);
 
-	}
-
-	/**
-	 * Pergunta ao usuário qual o concern deve ser considerado para a intersecção.
-	 *  lista de opções preparada a partir o vetor passado como parâmetro.
-	 *  
-	 * @param concerns
-	 * @return
-	 */
-	private String askByConcern(Object[] concerns){
-		ElementListSelectionDialog dialog = 
-				new ElementListSelectionDialog(
-						Display.getCurrent().getActiveShell(),
-						new LabelProvider());
-		
-		dialog.setElements(concerns);
-		dialog.setTitle("What Concern do you want to do interserction?");
-		if (dialog.open() != Window.OK) {
-		    return null;
-		}
-		Object[] result = dialog.getResult();
-		return (String)result[0];
-	}
-	
-	/**
-	 * @param files
-	 * @return
-	 * @throws Exception 
-	 */
-	private Set<String> getCMConcernNames(String[] files) throws Exception {
-		Set<String> concerns = new TreeSet<String>();
-		Document doc;
-		for (int j = 0; j < files.length; j++) {
-			doc = getDocument(files[j]);
-			NodeList tConcernsList = doc.getElementsByTagName("concern");				
-			
-			for (int i=0; i<tConcernsList.getLength(); i++) {
-				Node concernNode = tConcernsList.item(i);
-				if (concernNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) concernNode;
-					concerns.add( eElement.getAttribute("name") );					
-				}
-			}
-		}
-		return concerns;
 	}
 
 	/**
@@ -176,70 +114,29 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 	}
 	
 	/**
-	 * Cria um <code>{@link Document}</code> para manipular o arquivo .cm passado como 
-	 * 	parâmetro.
-	 * 
-	 * @param filename
-	 * @return
-	 * @throws Exception
-	 */
-	private static Document getDocument(String filename) throws Exception{
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		
-		File file = new File(filename);
-		
-		Document doc = dBuilder.parse(file);
-		doc.getDocumentElement().normalize();
-		
-		return doc;
-	}
-	
-	/**
-	 * retorna uma lista de elementos <code>&lt;element&gt;</code> dentro da tag <code>&lt;concern&gt;</code> 
-	 *  especificado pelo parâmetro <code>concernName</code>. Caso o concern não seja especificado retorna lista 
-	 *  de todos os elementos encontrados.
-	 * @param doc
+	 * Pergunta ao usuário qual o concern deve ser considerado para a intersecção.
+	 *  lista de opções preparada a partir o vetor passado como parâmetro.
+	 *  
+	 * @param concerns
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
-	private List getConcernElements(Document doc, String concernName) {
-		// TODO especificar o concern pra retornar os elements. 
-
-		ArrayList<CMElement> list = new ArrayList<CMElement>();
-		NodeList tConcernsList = doc.getElementsByTagName("concern");				
+	private String askByConcern(Object[] concerns){
+		ElementListSelectionDialog dialog = 
+				new ElementListSelectionDialog(
+						Display.getCurrent().getActiveShell(),
+						new LabelProvider());
 		
-		for (int i=0; i<tConcernsList.getLength(); i++) {
-			Node concernNode = tConcernsList.item(i);
-			String name = "";
-			if (concernNode.getNodeType() == Node.ELEMENT_NODE) {
-				Element eElement = (Element) concernNode;
-				name = eElement.getAttribute("name");
-			}
-			if (concernName!=null && !concernName.equals(name) ) {
-				break;
-			}
-			NodeList elementsList = doc.getElementsByTagName("element");
-			for (int temp = 0; temp < elementsList.getLength(); temp++) {
-				
-				Node nNode = elementsList.item(temp);
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-					
-					Element eElement = (Element) nNode;
-		
-					String degree = eElement.getAttribute("degree");
-					String id = eElement.getAttribute("id");
-					id = fixSpecialCharacters(id);
-					String type = eElement.getAttribute("type");
-					CMElement concernElement = new CMElement(degree, id, type);
-					
-					list.add(concernElement);
-				}
-			}
+		dialog.setElements(concerns);
+		dialog.setTitle("What Concern do you want to do interserction?");
+		// enquanto o usuário não disser qual é o concern
+		while (dialog.open() != Window.OK){
+			CmFilesOperations.showMessage("Do Intersection Action",
+					"You must point which concern do you want to make a intersection.");
 		}
-		return list;
+		Object[] result = dialog.getResult();
+		return (String)result[0];
 	}
-	
+
 	/**
 	 * Faz a intersecção de arquivos .cm contidos no vetor passado como parâmetro.
 	 * 
@@ -252,214 +149,28 @@ public class DoIntersectionAction implements IObjectActionDelegate {
 		
 		Stack elements = new Stack();
 		
-		ArrayList<CMElement> intersectionElements = new ArrayList<CMElement>();
+		ArrayList<CMElementTag> intersectionElements = new ArrayList<CMElementTag>();
 		
 		for (int i = 0; i < files.length; i++) {
 			try {
-				docs.put(i, getDocument(files[i]) );
-				elements.add( (ArrayList<CMElement>) getConcernElements(docs.get(i), concern));
+				docs.put(i, CmFilesOperations.getDocument(files[i]) );
+				elements.add( (ArrayList<CMElementTag>) CmFilesOperations.getConcernElements(docs.get(i), concern));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}		
 		}
 		
-		intersectionElements = (ArrayList<CMElement>) elements.pop();		
-		Set<ArrayList<CMElement>> conjunto = new HashSet<ArrayList<CMElement>>();
+		intersectionElements = (ArrayList<CMElementTag>) elements.pop();		
+		Set<ArrayList<CMElementTag>> conjunto = new HashSet<ArrayList<CMElementTag>>();
 
 		while (!elements.empty()) {
-			conjunto.add((ArrayList<CMElement>) elements.pop()); 
+			conjunto.add((ArrayList<CMElementTag>) elements.pop()); 
 		}
 				
-		for (ArrayList<CMElement> arrayList : conjunto) {
+		for (ArrayList<CMElementTag> arrayList : conjunto) {
 			intersectionElements.retainAll(arrayList);			
 		}
 				
-		writeToCMFile(concern, buildCMFile(concern, intersectionElements));
-	}
-	
-	/**
-	 * Retorna a mesma string com caracteres especiais (<,>) substituídos.
-	 * @param aText
-	 * @return
-	 */
-	public  String fixSpecialCharacters(String aText){
-		final StringBuilder result = new StringBuilder();
-	     final StringCharacterIterator iterator = new StringCharacterIterator(aText);
-	     char character =  iterator.current();
-	     while (character != CharacterIterator.DONE ){
-	       if (character == '<') {
-	         result.append("&lt;");
-	       }else if (character == '>') {
-	         result.append("&gt;");
-	       }else{
-	         //the char is not a special one, add it to the result as is
-	         result.append(character);
-	       }
-	       character = iterator.next();
-	     }
-	     return result.toString();
-	}
-
-	/**
-	 * Constrói uma string representando um arquivo .cm como no modelo abaixo:
-	 * 
-	 * <p><blockquote><pre>
-	 *     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	 *	 	<model>
-	 *	 		<concern name="clusterers">
-	 *	 			<element degree="100" id="=weka/" type="method"/>
-	 *	 		</concern>
-	 *		</model>
-	 *	</pre></blockquote>
-	 * @param concern
-	 * @param concernElements
-	 */
-	@SuppressWarnings("unchecked")
-	public String buildCMFile(String concern, List<CMElement> concernElements){
-		String cmString;
-		String header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>";
-		String openModel = "<model>";
-		String openConcern= "<concern name=\""+concern+"\">";
-		String closeConcern= "</concern>";
-		String closeModel = "</model>";
-		
-		cmString = header+openModel+openConcern;
-		
-		System.out.println(header);
-		System.out.println(openModel);
-		System.out.println(openConcern);
-		for (CMElement s : concernElements) {
-			System.out.println(s.toString());
-			cmString += s.toString();
-		}
-		System.out.println(closeConcern);
-		System.out.println(closeModel);
-		
-		cmString += closeConcern+closeModel;
-		return cmString;		
-	}
-	
-	/**
-	 * escreve um arquivo .cm correspondentes à string xml para o concern dado.
-	 * @param concern
-	 * @param xml
-	 */
-	private void writeToCMFile(String concern, String xml){
-		// write the content into xml file
-				TransformerFactory transformerFactory = TransformerFactory.newInstance();
-				Transformer transformer;
-				try {
-					transformer = transformerFactory.newTransformer();
-					DOMSource source = new DOMSource(stringToDom(xml));
-					StreamResult result = new StreamResult(new File(CM_PATH+File.separator+concern+"CM-intersection.cm"));
-					
-					transformer.transform(source, result);
-					
-					System.out.println("File saved!");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-	}
-	
-	/**
-	 * Converte string para Document
-	 * @param xmlSource
-	 * @return
-	 * @throws SAXException
-	 * @throws ParserConfigurationException
-	 * @throws IOException
-	 */
-	public Document stringToDom(String xmlSource) 
-	        throws SAXException, ParserConfigurationException, IOException {
-	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	    DocumentBuilder builder = factory.newDocumentBuilder();
-	    return builder.parse(new InputSource(new StringReader(xmlSource)));
-	}
-	
-	/**
-	 * Mosta um diálogo de informação com a <code>String</code> informada.
-	 * @param message
-	 */	
-	private void showMessage(String message) {
-		MessageDialog.openInformation(
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-				"Do Intersection Action", 
-				message);
-	}
-	/**
-	 * representa a tag <code>&lt;element&gt;</code> dos arquivos .cm
-	 * @author Alcemir R. Santos
-	 */
-	class CMElement {
-		private String degree;
-		private String id;
-		private String type;
-		
-		public CMElement(String degree, String id, String type) {
-			this.degree = degree;
-			this.id = id;
-			this.type = type;
-		}
-		public String getDegree() {
-			return degree;
-		}
-		public void setDegree(String degree) {
-			this.degree = degree;
-		}
-		public String getId() {
-			return id;
-		}
-		public void setId(String id) {
-			this.id = id;
-		}
-		public String getType() {
-			return type;
-		}
-		public void setType(String type) {
-			this.type = type;
-		}
-		
-		@Override
-		public String toString(){
-			return "<element degree=\""+this.degree+"\" id=\""+this.id+"\" type=\""+this.type+"\"/>";
-		}
-		
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result
-					+ ((degree == null) ? 0 : degree.hashCode());
-			result = prime * result + ((id == null) ? 0 : id.hashCode());
-			result = prime * result + ((type == null) ? 0 : type.hashCode());
-			return result;
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			CMElement other = (CMElement) obj;
-			if (degree == null) {
-				if (other.degree != null)
-					return false;
-			} else if (!degree.equals(other.degree))
-				return false;
-			if (id == null) {
-				if (other.id != null)
-					return false;
-			} else if (!id.equals(other.id))
-				return false;
-			if (type == null) {
-				if (other.type != null)
-					return false;
-			} else if (!type.equals(other.type))
-				return false;
-			return true;
-		}
+		CmFilesOperations.writeToCMFile(concern, CmFilesOperations.buildCMFileString(concern, intersectionElements), CM_PATH);
 	}
 }

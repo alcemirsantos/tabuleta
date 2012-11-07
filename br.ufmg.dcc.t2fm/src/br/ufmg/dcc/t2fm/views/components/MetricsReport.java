@@ -13,12 +13,14 @@
 package br.ufmg.dcc.t2fm.views.components;
 
 /**
+ * Esta classe representa um relatório dos valores obtidos em uma compraração de um par de arquivos .cm.
+ * 
  * @author Alcemir R. Santos
  *
  */
 public class MetricsReport {
 
-	private String file;
+	private String fileName;
 	private String truePositives;
 	private String falsePositives;
 	private String falseNegatives;
@@ -27,6 +29,7 @@ public class MetricsReport {
 	private String precision;
 	
 	/**
+	 * @param filename
 	 * @param truePositives
 	 * @param falsePositives
 	 * @param falseNegatives
@@ -34,11 +37,10 @@ public class MetricsReport {
 	 * @param recall
 	 * @param precision
 	 */
-	public MetricsReport(String file, String truePositives, String falsePositives,
-			String falseNegatives, String f1Score, String recall,
-			String precision) {
+	public MetricsReport(String filename, String truePositives, String falsePositives,
+			String falseNegatives, String recall, String precision, String f1Score) {
 		super();
-		this.file = file;
+		this.fileName = filename;
 		this.truePositives = truePositives;
 		this.falsePositives = falsePositives;
 		this.falseNegatives = falseNegatives;
@@ -92,8 +94,8 @@ public class MetricsReport {
 	/**
 	 * @param file the file to set
 	 */
-	public void setFile(String file) {
-		this.file = file;
+	public void setFileName(String file) {
+		this.fileName = file;
 	}
 
 	/**
@@ -141,8 +143,8 @@ public class MetricsReport {
 	/**
 	 * @return the file
 	 */
-	public String getFile() {
-		return file;
+	public String getFileName() {
+		return fileName;
 	}
 
 }

@@ -10,15 +10,16 @@
  * 			architeture. ConcernMapper is available at
  * 			http://www.cs.mcgill.ca/~martin/cm/
  *************************************************************************/
-package br.ufmg.dcc.t2fm.views;
+package br.ufmg.dcc.t2fm.views.components;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-
-import br.ufmg.dcc.t2fm.views.components.MetricsReport;
+import br.ufmg.dcc.t2fm.views.MetricsView;
 
 /**
+ * Esta classe fornece os dados para exibição na {@link MetricsView}.
+ * 
  * @author Alcemir R. Santos
  */
 public class MetricsManager {
@@ -40,12 +41,12 @@ public class MetricsManager {
 			reports = new ArrayList<MetricsReport>();
 		}
 		reports.add(i);
+		MetricsView.getMetricsView().refresh();
 	}
 
 	public Collection<MetricsReport> getItens() {
 		if (reports == null) {
-			// TODO load itens
-			addMetricsReport(new MetricsReport("file.cm", "a", "b", "c", "d", "e", "f"));
+			reports = new ArrayList<MetricsReport>();
 		}
 		return reports;
 	}
