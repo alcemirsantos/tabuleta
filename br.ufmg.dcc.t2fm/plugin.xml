@@ -2,7 +2,7 @@
 <?eclipse version="3.4"?>
 <!--
 
-Test2FeatureMapper - A test-based feature location plug-in for Eclipse
+TaBuLeTa - A test-based feature location plug-in for Eclipse
 Copyright (C) 2012  Federal University of Minas Gerais (http://www.ufmg.br/~alcemir)
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the Eclipse Public License v1.0
@@ -17,20 +17,20 @@ http://www.eclipse.org/legal/epl-v10.html
          point="org.eclipse.ui.views">
       <category
             name="TaBuLeTa"
-            id="br.ufmg.dcc.t2fm">
+            id="br.ufmg.dcc.tabuleta">
       </category>
       <view
-            name="T2FMapping"
+            name="Test2Feature Mapping"
             icon="icons/sample.gif"
-            category="br.ufmg.dcc.t2fm"
-            class="br.ufmg.dcc.t2fm.views.MapView"
-            id="br.ufmg.dcc.t2fm.views.MapView">
+            category="br.ufmg.dcc.tabuleta"
+            class="br.ufmg.dcc.tabuleta.views.T2FMappingView"
+            id="br.ufmg.dcc.tabuleta.views.MapView">
       </view>
       <view
-            category="br.ufmg.dcc.t2fm"
-            class="br.ufmg.dcc.t2fm.views.MetricsView"
+            category="br.ufmg.dcc.tabuleta"
+            class="br.ufmg.dcc.tabuleta.views.MetricsView"
             icon="icons/sample.gif"
-            id="br.ufmg.dcc.t2fm.views.MetricsView"
+            id="br.ufmg.dcc.tabuleta.views.MetricsView"
             name="Metrics"
             restorable="true">
       </view>
@@ -44,7 +44,7 @@ http://www.eclipse.org/legal/epl-v10.html
                ratio="0.7"
                relative="org.eclipse.jdt.ui.PackageExplorer"
                relationship="bottom"
-               id="br.ufmg.dcc.t2fm.views.MapView">
+               id="br.ufmg.dcc.tabuleta.views.MapView">
          </view>
       </perspectiveExtension>
    </extension>
@@ -54,46 +54,46 @@ http://www.eclipse.org/legal/epl-v10.html
       <objectContribution
             objectClass="org.eclipse.core.resources.IFile"
             nameFilter="*.cm"
-            id="br.ufmg.dcc.t2fm.cm.popup">
+            id="br.ufmg.dcc.tabuleta.cm.popup">
          <action
                enablesFor="1"
                label="Load Features"
-               class="br.ufmg.dcc.t2fm.actions.LoadConcernModelAction"
+               class="br.ufmg.dcc.tabuleta.actions.LoadConcernModelAction"
                menubarPath="group.cm"
-               id="br.ufmg.dcc.t2fm.actions.LoadConcernModelAction"/>
+               id="br.ufmg.dcc.tabuleta.actions.LoadConcernModelAction"/>
       </objectContribution>
       <objectContribution
             adaptable="false"
-            id="br.ufmg.dcc.t2fm.addToFeatureObjectContribution"
+            id="br.ufmg.dcc.tabuleta.addToFeatureObjectContribution"
             objectClass="org.eclipse.jdt.core.IJavaElement">
          <action
-               class="br.ufmg.dcc.t2fm.actions.AddToConcernAction"
+               class="br.ufmg.dcc.tabuleta.actions.AddToConcernAction"
                icon="icons/sample.gif"
-               id="br.ufmg.dcc.t2fm.addToFeatureAction"
+               id="br.ufmg.dcc.tabuleta.addToFeatureAction"
                label="Add to Feature"
                style="pulldown">
          </action>
       </objectContribution>
       
       <viewerContribution
-            id="br.ufmg.dcc.t2fm.addToFeatureEditorContribution"
+            id="br.ufmg.dcc.tabuleta.addToFeatureEditorContribution"
             targetID="org.eclipse.jdt.ui.CompilationUnitEditor.EditorContext">
          <action
-               class="br.ufmg.dcc.t2fm.actions.AddToConcernAction"
-               id="br.ufmg.dcc.t2fm.addToFeatureEditorAction"
+               class="br.ufmg.dcc.tabuleta.actions.AddToConcernAction"
+               id="br.ufmg.dcc.tabuleta.addToFeatureEditorAction"
                label="Add to Feature"
                menubarPath="additions"
                style="pulldown"/>
       </viewerContribution>
       <objectContribution
             adaptable="true"
-            id="br.ufmg.dcc.t2fm.doIntersection"
+            id="br.ufmg.dcc.tabuleta.doIntersection"
             nameFilter="*.cm"
             objectClass="org.eclipse.core.resources.IResource">
             <menu 
             		label = "TaBuLeTa"
             		path = "additions"
-            		id = "br.ufmg.dcc.t2fm.tabuleta.additions.menu">
+            		id = "br.ufmg.dcc.tabuleta.tabuleta.additions.menu">
             	<groupMarker
                    name="content">
             	</groupMarker>
@@ -102,22 +102,22 @@ http://www.eclipse.org/legal/epl-v10.html
             	</separator>
             </menu>
             <action
-                  id="br.ufmg.dcc.t2fm.doIntersection"
+                  id="br.ufmg.dcc.tabuleta.doIntersection"
                   label="Do Intersection"
                   icon="icons/sample.gif"
                   tooltip="Do intersection between .cm files."
-                  menubarPath="br.ufmg.dcc.t2fm.tabuleta.additions.menu/content"
+                  menubarPath="br.ufmg.dcc.tabuleta.tabuleta.additions.menu/content"
                   enablesFor="2+"
-                  class="br.ufmg.dcc.t2fm.actions.DoIntersectionAction">
+                  class="br.ufmg.dcc.tabuleta.actions.DoIntersectionAction">
             </action>
             <action
-                  id="br.ufmg.dcc.t2fm.calculateMetrics"
+                  id="br.ufmg.dcc.tabuleta.calculateMetrics"
                   label="Calculate Metrics"
                   icon="icons/sample.gif"
                   tooltip="Calculate metrics from .cm files."
-                  menubarPath="br.ufmg.dcc.t2fm.tabuleta.additions.menu/content"
+                  menubarPath="br.ufmg.dcc.tabuleta.tabuleta.additions.menu/content"
                   enablesFor="2"
-                  class="br.ufmg.dcc.t2fm.actions.CalculateMetricsAction">
+                  class="br.ufmg.dcc.tabuleta.actions.CalculateMetricsAction">
             </action>
       </objectContribution>
    </extension>
@@ -125,9 +125,9 @@ http://www.eclipse.org/legal/epl-v10.html
    <extension
          point="org.eclipse.ui.decorators">
       <decorator
-         	id="br.ufmg.dcc.t2fm.decorator"
+         	id="br.ufmg.dcc.tabuleta.decorator"
          	label="Concern Mapper Decorator"
-         	class="br.ufmg.dcc.t2fm.decorators.LightWeightDecorator"
+         	class="br.ufmg.dcc.tabuleta.decorators.LightWeightDecorator"
          	adaptable="false"
          	state="true"
          	lightweight="true"
@@ -144,20 +144,20 @@ http://www.eclipse.org/legal/epl-v10.html
          point="org.eclipse.ui.preferencePages">
       <page
             name="TaBuLeTa"
-            class="br.ufmg.dcc.t2fm.ui.Test2FeatureMapperPreferencePage"
-            id="br.ufmg.dcc.t2fm.Test2FeatureMapperPreferencePage">
+            class="br.ufmg.dcc.tabuleta.ui.TabuletaPreferencePage"
+            id="br.ufmg.dcc.tabuleta.TabuletaPreferencePage">
       </page>
       <page
             name="ConcernMapper"
-            class="br.ufmg.dcc.t2fm.ui.ConcernMapperPreferencePage"
-            id="br.ufmg.dcc.t2fm.ConcernMapperPreferencePage"
-            category="br.ufmg.dcc.t2fm.Test2FeatureMapperPreferencePage">
+            class="br.ufmg.dcc.tabuleta.ui.ConcernMapperPreferencePage"
+            id="br.ufmg.dcc.tabuleta.ConcernMapperPreferencePage"
+            category="br.ufmg.dcc.tabuleta.TabuletaPreferencePage">
       </page>
    </extension>
    <extension 
    		point="org.eclipse.core.runtime.preferences">
 	  <initializer 
-	  	class="br.ufmg.dcc.t2fm.ConcernMapperPreferenceInitializer"/>
+	  	class="br.ufmg.dcc.tabuleta.ConcernMapperPreferenceInitializer"/>
    </extension>
    <!--  -->
    
@@ -178,7 +178,7 @@ http://www.eclipse.org/legal/epl-v10.html
     <!-- Launch Groups -->	
    	<extension point = "org.eclipse.debug.ui.launchGroups">
 		<launchGroup
-			id = "br.ufmg.dcc.t2fm.launchGroup.coverage"
+			id = "br.ufmg.dcc.tabuleta.launchGroup.coverage"
 			mode = "coverage"
 			label ="Coverage"
 			image = "icons/full/ctool16/debug_exc.gif"
@@ -211,9 +211,9 @@ http://www.eclipse.org/legal/epl-v10.html
    		</extension-->
 	   <extension  point="org.eclipse.core.expressions.propertyTesters">
 	   	<propertyTester
-	   		class="br.ufmg.dcc.t2fm.launching.FetureNodeLaunchableTester"
-            id="br.ufmg.dcc.t2fm.launching.propertyTester.contextualLaunchable"
-            namespace="br.ufmg.dcc.t2fm.ui"
+	   		class="br.ufmg.dcc.tabuleta.launching.FetureNodeLaunchableTester"
+            id="br.ufmg.dcc.tabuleta.launching.propertyTester.contextualLaunchable"
+            namespace="br.ufmg.dcc.tabuleta.ui"
             properties="launchable"
             type="java.lang.Object"/>
         </extension>
@@ -231,7 +231,7 @@ http://www.eclipse.org/legal/epl-v10.html
            <enablement>
              <with variable="selection">
                <test
-					property="br.ufmg.dcc.t2fm.ui.launchable" 
+					property="br.ufmg.dcc.tabuleta.ui.launchable" 
               		args="org.eclipse.jdt.junit.junitShortcut"/>
              </with>
 
@@ -244,7 +244,7 @@ http://www.eclipse.org/legal/epl-v10.html
          point="org.eclipse.ui.commands">
       <category
             id="com.mountainminds.eclemma.ui"
-            name="Test2Feature Mapper">
+            name="Tabuleta">
       </category>
      
       <command
@@ -298,14 +298,14 @@ http://www.eclipse.org/legal/epl-v10.html
          point="org.eclipse.core.runtime.adapters">
       <factory
       		class=""
-            adaptableType="br.ufmg.dcc.t2fm.views.components.ConcernNode">
+            adaptableType="br.ufmg.dcc.tabuleta.views.components.ConcernNode">
          <adapter
                type="org.eclipse.debug.ui.actions.ILaunchable">
          </adapter>
       </factory>
       <!--factory
-      		class = "br.ufmg.dcc.t2fm.launching.adapter.FeatureNodeAdapterFactory"
-            adaptableType="br.ufmg.dcc.t2fm.views.components.ConcernNode">
+      		class = "br.ufmg.dcc.tabuleta.launching.adapter.FeatureNodeAdapterFactory"
+            adaptableType="br.ufmg.dcc.tabuleta.views.components.ConcernNode">
          <adapter
                type="org.eclipse.core.resources.mapping.ResourceMapping">
          </adapter>
