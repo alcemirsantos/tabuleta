@@ -183,9 +183,12 @@ public class JavaFileWriter {
 	 */
 	private String getPackage(JavaElementNode jen) {
 		String result = "";
-		IPath path = jen.getElement().getPrimaryElement().getPath();
-		String[] split = path.toString().split(File.separator);
-		for (int i = 3; i < split.length - 1; i++) {
+		IPath path = jen.getElement().getPrimaryElement().getResource().getLocation();
+		String sPath = path.toString();
+		String complement = sPath.substring(this.dirName.length()+1);
+		String[] split = complement.split(File.separator);
+		
+		for (int i = 0; i < split.length - 1; i++) {
 			result += split[i] + ".";
 		}
 		return result;

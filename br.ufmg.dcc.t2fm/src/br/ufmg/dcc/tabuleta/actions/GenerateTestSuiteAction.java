@@ -58,7 +58,7 @@ public class GenerateTestSuiteAction extends Action {
 
 	public void run()  {
 		IFile lFile = null;
-		IPath lPath = null;
+		IPath fullPathTrunkedByWorkspacePath = null;
 		String className = "";
 		String selectedFeature = "";
 		if (aView.getCurrentSelection().isEmpty()) {
@@ -75,7 +75,7 @@ public class GenerateTestSuiteAction extends Action {
 		}
 		
 		IWorkspace lWorkspace = ResourcesPlugin.getWorkspace();
-		IPath s = lWorkspace.getRoot().getLocation();
+		IPath workspacePath = lWorkspace.getRoot().getLocation();
 		
 		String testPath = Tabuleta.getDefault().getPreferenceStore().getString("TESTSPATH");
 		if (testPath==null || testPath.isEmpty()) {
@@ -86,7 +86,7 @@ public class GenerateTestSuiteAction extends Action {
 			// find file in workspace
 			IFile file =  ResourcesPlugin.getWorkspace().getRoot().getFileForLocation( aPath );
 			if (file != null ) {
-				lPath = trunkPath(file.getLocation(), s);
+				fullPathTrunkedByWorkspacePath = trunkPath(file.getLocation(), workspacePath);
 			}else{
 				showMessage("We are not able to find the path to tests files. You can set it on the preference page.");
 				return;
@@ -94,13 +94,13 @@ public class GenerateTestSuiteAction extends Action {
 		}
 		// check if file in workspace
 		
-		String src = s.toString() + File.separator +lPath.segment(0) + File.separator + lPath.segment(1);
-		String pakkage = buildPackage(lPath);
+//		String src = workspacePath.toString() + File.separator +fullPathTrunkedByWorkspacePath.segment(0) + File.separator + fullPathTrunkedByWorkspacePath.segment(1);
+		String pakkage = buildPackage(fullPathTrunkedByWorkspacePath);
 		className = genClassName(selectedFeature);
-		lFile = lWorkspace.getRoot().getFile( lPath );
+		lFile = lWorkspace.getRoot().getFile( fullPathTrunkedByWorkspacePath );
 		
 		if( !lFile.exists() ){
-			JavaFileWriter lWriter = new JavaFileWriter(src, pakkage, className, Tabuleta.getDefault().getConcernModel() );
+			JavaFileWriter lWriter = new JavaFileWriter(testPath, pakkage, className, Tabuleta.getDefault().getConcernModel() );
 			lWriter.write(aView.getCurrentSelection());
 		}else{
 			// TODO ask if wants to overwrite the already existent file. 
@@ -111,6 +111,7 @@ public class GenerateTestSuiteAction extends Action {
 	}
 
 	/**
+	 * Constrói o nome da suíte de teste de acordo com o nome passado.
 	 * @param selectedFeature
 	 * @return
 	 */
@@ -120,22 +121,36 @@ public class GenerateTestSuiteAction extends Action {
 		return s;
 	}
 
+	/**
+	 * Dado o parâmetro <b>path</b>, que representa um caminho completo, este método retorna uma instância
+	 *   de {@link IPath} em que o parâmetro remove o pedaço do caminho representado por <b>with</b>.
+	 *    
+	 * @param path
+	 * @param with
+	 * @return
+	 */
 	private IPath trunkPath(IPath path, IPath with){
 		int i = path.matchingFirstSegments(with);		
 		return path.removeFirstSegments(i);
 	}
 
+	/**
+	 * Constói o pacote para inserção da classe gerada.
+	 * 
+	 * @param lPath
+	 * @return
+	 */
 	private String buildPackage(IPath lPath) {
 		String pakkage = "tabuleta.testsuites";
 		String tabuleta = "tabuleta";
 		String testsuites = "testsuites";
 		
-		if (lPath.segmentCount()>2) {
-			pakkage = lPath.segment(2);
-			for (int i = 3; i < lPath.segments().length - 1; i++) {
-				pakkage += "." + lPath.segment(i);
-			}
-		} else{
+//		if (lPath.segmentCount()>2) {
+//			pakkage = lPath.segment(2);
+//			for (int i = 3; i < lPath.segments().length - 1; i++) {
+//				pakkage += "." + lPath.segment(i);
+//			}
+//		} else{
 			IFolder iff = (IFolder) ResourcesPlugin.getWorkspace().getRoot().getFolder(lPath.append(tabuleta));
 			try {
 				iff.create(true, true, new NullProgressMonitor());
@@ -144,7 +159,7 @@ public class GenerateTestSuiteAction extends Action {
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
-		}
+//		}
 		return pakkage;
 	}
 
