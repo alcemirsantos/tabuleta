@@ -51,6 +51,7 @@ import br.ufmg.dcc.tabuleta.actions.DoIntersectionAction;
 public class CmFilesOperations {
 	
 	/**
+	 * Retorna o nome dos concerns existentes no conjunto de arquivos passado como parâmtro.
 	 * @param files
 	 * @return
 	 * @throws Exception 

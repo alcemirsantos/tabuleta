@@ -50,9 +50,6 @@ public class CalculateMetricsAction implements IObjectActionDelegate {
 
 	private String CM_PATH;
 	private ISelection selection;
-	
-	private static List oracleElements = new ArrayList<CMElementTag>();
-	private static List<CMElementTag> t2fElements = new ArrayList<CMElementTag>();
 
 	private String cmTarget;
 	/**
@@ -205,12 +202,8 @@ public class CalculateMetricsAction implements IObjectActionDelegate {
 	@SuppressWarnings("unchecked")
 	private void compareCMFiles(String oracle,String t2f, String concern ){
 
-		// true positives
-		List<CMElementTag> tpElements = new ArrayList<CMElementTag>();
-		// false positives
-		List<CMElementTag> fpElements = new ArrayList<CMElementTag>();
-		// false negatives
-		List<CMElementTag> fnElements = new ArrayList<CMElementTag>();
+		List<CMElementTag> oracleElements = new ArrayList<CMElementTag>();
+		List<CMElementTag> t2fElements = new ArrayList<CMElementTag>();
 		
 		Document docOracle = null;
 		Document docT2f = null;
