@@ -32,6 +32,7 @@ import org.w3c.dom.Document;
 import br.ufmg.dcc.tabuleta.Tabuleta;
 import br.ufmg.dcc.tabuleta.actions.util.CMElementTag;
 import br.ufmg.dcc.tabuleta.actions.util.CmFilesOperations;
+import br.ufmg.dcc.tabuleta.actions.util.MetricsCalculator;
 import br.ufmg.dcc.tabuleta.views.MetricsView;
 import br.ufmg.dcc.tabuleta.views.components.MetricsManager;
 import br.ufmg.dcc.tabuleta.views.components.MetricsReport;
@@ -50,8 +51,8 @@ public class CalculateMetricsAction implements IObjectActionDelegate {
 	private String CM_PATH;
 	private ISelection selection;
 	
-	private static ArrayList<CMElementTag> oracleElements = new ArrayList<CMElementTag>();
-	private static ArrayList<CMElementTag> t2fElements = new ArrayList<CMElementTag>();
+	private static List oracleElements = new ArrayList<CMElementTag>();
+	private static List<CMElementTag> t2fElements = new ArrayList<CMElementTag>();
 
 	private String cmTarget;
 	/**
@@ -217,35 +218,17 @@ public class CalculateMetricsAction implements IObjectActionDelegate {
 			docOracle = CmFilesOperations.getDocument(oracle);
 			docT2f = CmFilesOperations.getDocument(t2f);
 
-			oracleElements = (ArrayList<CMElementTag>) CmFilesOperations.getConcernElements(docOracle, concern);
-			t2fElements = (ArrayList<CMElementTag>) CmFilesOperations.getConcernElements(docT2f, concern);
+			oracleElements = CmFilesOperations.getConcernElements(docOracle, concern);
+			t2fElements = CmFilesOperations.getConcernElements(docT2f, concern);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+			
+		MetricsCalculator calculator = new MetricsCalculator(oracleElements, t2fElements);
 		
-		for (CMElementTag s : oracleElements) {
-			if (t2fElements.contains(s)) {
-				tpElements.add( s );				
-			}else{
-				fnElements.add( s );
-			}
-		}
-		
-		for (CMElementTag s : t2fElements) {
-			if (!oracleElements.contains(s)) {
-				fpElements.add( s );
-			}					
-		}
-		
-		printMetrics(cmTarget, tpElements.size(), fpElements.size(), fnElements.size());		
+		printMetrics(cmTarget, calculator);		
 	}
 	
-
-	
-
-	
-
-
 	/**
 	 * imprime as métricas de TP; FP; FN; precision e recall;
 	 * 
@@ -254,26 +237,23 @@ public class CalculateMetricsAction implements IObjectActionDelegate {
 	 * @param fp
 	 * @param fn
 	 */
-	private void printMetrics(String filename, double tp,
-			double fp, double fn) {
+	private void printMetrics(String filename, MetricsCalculator calc) {
 			
 		System.out.println("~~~~~~~~~~~~~~~~");
-		System.out.println("TP size: "+tp);
-		System.out.println("FP size: "+fp);
-		System.out.println("FN size: "+fn);
-		double r = tp/(tp+fn);
-		double p = tp/(tp+fp);
-		double f = (2*p*r)/(p+r);
-		System.out.println("recall: "+r);
-		System.out.println("precision: "+p);
+		System.out.println("TP size: "+calc.getTP());
+		System.out.println("FP size: "+calc.getFP());
+		System.out.println("FN size: "+calc.getFN());
+		System.out.println("recall: "+calc.getRecall());
+		System.out.println("precision: "+calc.getPrecision());
+		System.out.println("f1-score: "+calc.getF1Score());
 		System.out.println("~~~~~~~~~~~~~~~~");
 		
-		String truePositives = String.valueOf(tp);
-		String falsePositives = String.valueOf(fp);
-		String falseNegatives = String.valueOf(fn);
-		String recall = String.valueOf(r);
-		String precision = String.valueOf(p);
-		String f1Score = String.valueOf(f);
+		String truePositives = String.valueOf(calc.getTP());
+		String falsePositives = String.valueOf(calc.getFP());
+		String falseNegatives = String.valueOf(calc.getFN());
+		String recall = String.valueOf(calc.getRecall());
+		String precision = String.valueOf(calc.getPrecision());
+		String f1Score = String.valueOf(calc.getF1Score());
 		
 		MetricsManager.getInstance().addMetricsReport(
 				new MetricsReport(filename, truePositives, falsePositives, falseNegatives, recall, precision, f1Score));

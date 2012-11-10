@@ -10,8 +10,7 @@
  * 			architeture. ConcernMapper is available at
  * 			http://www.cs.mcgill.ca/~martin/cm/
  *************************************************************************/
-package br.ufmg.dcc.tabuleta.actions.util;
-
+package alcemir.comparator;
 
 /**
  * Esta classe representa uma tag <code>&lt;element&gt;</code> de um arquivo <code>.cm</code>.
@@ -54,6 +53,7 @@ public class CMElementTag {
 	public String toString(){
 		return "<element degree=\""+this.degree+"\" id=\""+this.id+"\" type=\""+this.type+"\"/>";
 	}
+	
 	
 	@Override
 	public boolean equals(Object obj) {

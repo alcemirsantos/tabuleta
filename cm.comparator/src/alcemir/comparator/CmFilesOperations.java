@@ -10,7 +10,7 @@
  * 			architeture. ConcernMapper is available at
  * 			http://www.cs.mcgill.ca/~martin/cm/
  *************************************************************************/
-package br.ufmg.dcc.tabuleta.actions.util;
+package alcemir.comparator;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,8 +30,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.PlatformUI;
+//import org.eclipse.jface.dialogs.MessageDialog;
+//import org.eclipse.ui.PlatformUI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -39,8 +39,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import br.ufmg.dcc.tabuleta.actions.CalculateMetricsAction;
-import br.ufmg.dcc.tabuleta.actions.DoIntersectionAction;
+//import br.ufmg.dcc.tabuleta.actions.CalculateMetricsAction;
+//import br.ufmg.dcc.tabuleta.actions.DoIntersectionAction;
 
 /**
  * Esta classe contém métodos para a manipulação de arquivos <code>.cm</code>. Estes métodos são
@@ -102,6 +102,7 @@ public class CmFilesOperations {
 	 */
 	@SuppressWarnings("rawtypes")
 	public static List getConcernElements(Document doc, String concernName) {
+
 		doc.normalize();
 		ArrayList<CMElementTag> result = new ArrayList<CMElementTag>();
 			
@@ -125,7 +126,7 @@ public class CmFilesOperations {
 				result.add(concernElement);
 			}
 		}
-		return result;	
+		return result;
 	}
 	
 	/**
@@ -237,10 +238,10 @@ public class CmFilesOperations {
 	 * @param message
 	 */	
 	public static void showMessage(String title, String message) {
-		MessageDialog.openInformation(
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-				title, 
-				message);
+//		MessageDialog.openInformation(
+//				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+//				title, 
+//				message);
 	}
 	
 }
