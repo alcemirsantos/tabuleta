@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="br.ufmg.dcc.tabuleta.feature"
-      label="TaBuLeTa Plugin Feature"
+      label="br.ufmg.dcc.tabuleta.feature.all"
       version="1.0.0.qualifier"
       provider-name="Universidade Federal de Minas Gerais - UFMG"
       plugin="br.ufmg.dcc.tabuleta">

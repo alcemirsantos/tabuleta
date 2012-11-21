@@ -5,7 +5,7 @@
        allows the users to add computational units (such as, classes, methods, and fields) to features
        they want to locate.
    </description>
-   <feature url="features/br.ufmg.dcc.tabuleta.feature_1.0.0.201211211754.jar" id="br.ufmg.dcc.tabuleta.feature" version="1.0.0.201211211754">
+   <feature url="features/br.ufmg.dcc.tabuleta.feature_1.0.0.201211211948.jar" id="br.ufmg.dcc.tabuleta.feature" version="1.0.0.201211211948">
       <category name="br.ufmg.dcc.tabuleta.category"/>
    </feature>
    <category-def name="br.ufmg.dcc.tabuleta.category" label="TaBuLeTa">
