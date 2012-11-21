@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
    <description name="TaBuLeTa uptade site" url="http://www.dcc.ufmg.br/~alcemir/tabuleta/update">
-      The TaBuLeTa plugin, created over the Masters course of Alcemir Santos, will display a view that allows the users to add computational units (such as, classes, methods, and fields) to features they want to locate.
+      The TaBuLeTa plugin, created over the Masters course of Alcemir Santos, will display a view that
+       allows the users to add computational units (such as, classes, methods, and fields) to features
+       they want to locate.
    </description>
-   <feature url="features/br.ufmg.dcc.tabuleta.feature_1.0.0.201211211612.jar" id="br.ufmg.dcc.tabuleta.feature" version="1.0.0.201211211612">
-      <category name="TaBuLeTa"/>
+   <feature url="features/br.ufmg.dcc.tabuleta.feature_1.0.0.201211211754.jar" id="br.ufmg.dcc.tabuleta.feature" version="1.0.0.201211211754">
+      <category name="br.ufmg.dcc.tabuleta.category"/>
    </feature>
-   <category-def name="TaBuLeTa" label="TaBuLeTa Category">
+   <category-def name="br.ufmg.dcc.tabuleta.category" label="TaBuLeTa">
       <description>
-         This category contains all of the TaBuLeTa features
+         This category contains all of the TaBuLeTa plugin features
       </description>
    </category-def>
 </site>

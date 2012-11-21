@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="br.ufmg.dcc.tabuleta.feature"
-      label="TaBuLeTa Core"
+      label="TaBuLeTa Plugin Feature"
       version="1.0.0.qualifier"
-      provider-name="Universidade Federal de Minas Gerais"
+      provider-name="Universidade Federal de Minas Gerais - UFMG"
       plugin="br.ufmg.dcc.tabuleta">
 
    <description url="http://www.example.com/description">
