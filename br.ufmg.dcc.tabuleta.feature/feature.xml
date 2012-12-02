@@ -109,70 +109,49 @@ This Agreement is governed by the laws of the State of New York and the intellec
          id="com.mountainminds.eclemma.core"
          download-size="0"
          install-size="0"
-         version="2.1.4.201208011137"
+         version="2.1.2.201205091942"
          unpack="false"/>
 
    <plugin
          id="com.mountainminds.eclemma.debug.ui.compatibility"
          download-size="0"
          install-size="0"
-         version="2.1.4.201208011137"
+         version="2.1.2.201205091942"
          unpack="false"/>
 
    <plugin
          id="com.mountainminds.eclemma.doc"
          download-size="0"
          install-size="0"
-         version="2.1.4.201208011137"
+         version="2.1.2.201205091942"
          unpack="false"/>
 
    <plugin
          id="com.mountainminds.eclemma.ui"
          download-size="0"
          install-size="0"
-         version="2.1.4.201208011137"
+         version="2.1.2.201205091942"
          unpack="false"/>
 
    <plugin
          id="org.jacoco.agent"
          download-size="0"
          install-size="0"
-         version="0.5.9.201207300726"
-         unpack="false"/>
-
-   <plugin
-         id="org.jacoco.agent"
-         download-size="0"
-         install-size="0"
-         version="0.5.9.201207300726"
+         version="0.5.7.201204190339"
          unpack="false"/>
 
    <plugin
          id="org.jacoco.core"
          download-size="0"
          install-size="0"
-         version="0.5.9.201207300726"
-         unpack="false"/>
-
-   <plugin
-         id="org.jacoco.core"
-         download-size="0"
-         install-size="0"
-         version="0.5.9.201207300726"
+         version="0.5.7.201204190339"
          unpack="false"/>
 
    <plugin
          id="org.jacoco.report"
          download-size="0"
          install-size="0"
-         version="0.5.9.201207300726"
-         unpack="false"/>
-
-   <plugin
-         id="org.jacoco.report"
-         download-size="0"
-         install-size="0"
-         version="0.5.9.201207300726"
+         version="0.5.7.201204190339"
          unpack="false"/>
 
 </feature>
