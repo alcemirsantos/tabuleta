@@ -78,6 +78,10 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.views.navigator.LocalSelectionTransfer;
 
+import com.mountainminds.eclemma.core.ICoverageSession;
+import com.mountainminds.eclemma.core.ISessionListener;
+import com.mountainminds.eclemma.internal.core.EclEmmaCorePlugin;
+import com.mountainminds.eclemma.internal.core.SessionManager;
 import com.mountainminds.eclemma.internal.ui.actions.CoverageAsAction;
 
 import br.ufmg.dcc.tabuleta.Tabuleta;
@@ -131,6 +135,7 @@ public class T2FMappingView extends ViewPart implements ConcernModelChangeListen
 		private Text aDegreeValue;
 		private Composite aSliderPanel;
 		private SaveAction aSaveAction;
+		private SaveCoverageAsCMAction saveCoverageAsCMAction;
 		private Action aDoubleClickAction;
 		private FilterAction aFilterAction;
 		private ISelectionChangedListener aSelectionListener;
@@ -458,8 +463,8 @@ public class T2FMappingView extends ViewPart implements ConcernModelChangeListen
 		    aSaveAction = new SaveAction( this );
 		    aSaveAction.setEnabled( Tabuleta.getDefault().isDirty() );
 		    
-//		    aLocateAction = new LocateAction( this );
-//		    aLocateAction.setEnabled( aViewer.getSelection()!=null?true:false);
+		    saveCoverageAsCMAction = new SaveCoverageAsCMAction(this);
+		    saveCoverageAsCMAction.setEnabled(false);
 		    
 		    aDoubleClickAction = new Action() 
 			{
@@ -530,6 +535,9 @@ public class T2FMappingView extends ViewPart implements ConcernModelChangeListen
 			aSelectionListener =  new ConcernMapperSelectionChangedListener();
 			
 			aViewer.addSelectionChangedListener( aSelectionListener );
+			
+			CoverageSessionChangedListener aCoverageSessionChangedListener = new CoverageSessionChangedListener();
+			EclEmmaCorePlugin.getInstance().getSessionManager().addSessionListener(aCoverageSessionChangedListener);
 			
 			aDegreeSlider.addSelectionListener( new SelectionListener() {
 				
@@ -658,8 +666,7 @@ public class T2FMappingView extends ViewPart implements ConcernModelChangeListen
 		private void fillLocalToolBar( IToolBarManager pManager ) 
 		{
 			pManager.add( new ClearAction());
-//			pManager.add( new LocateAction(this));
-			pManager.add( new SaveCoverageAsCMAction(this) );
+			pManager.add( saveCoverageAsCMAction);
 			pManager.add( new GenerateTestSuiteAction(this) );
 			pManager.add( aSaveAction );
 			pManager.add( new SaveAsAction( this ));
@@ -1220,6 +1227,36 @@ public class T2FMappingView extends ViewPart implements ConcernModelChangeListen
 			}
 	    }
 	    
+	    class CoverageSessionChangedListener implements ISessionListener{
+
+			/* (non-Javadoc)
+			 * @see com.mountainminds.eclemma.core.ISessionListener#sessionAdded(com.mountainminds.eclemma.core.ICoverageSession)
+			 */
+			@Override
+			public void sessionAdded(ICoverageSession addedSession) {
+				// TODO Auto-generated method stub
+			}
+
+			/* (non-Javadoc)
+			 * @see com.mountainminds.eclemma.core.ISessionListener#sessionRemoved(com.mountainminds.eclemma.core.ICoverageSession)
+			 */
+			@Override
+			public void sessionRemoved(ICoverageSession removedSession) {
+				// TODO Auto-generated method stub
+			}
+
+			/**
+			 * Sempre que uma sessão do EclEmma for ativada este método é chamado. 
+			 */
+			/* (non-Javadoc)
+			 * @see com.mountainminds.eclemma.core.ISessionListener#sessionActivated(com.mountainminds.eclemma.core.ICoverageSession)
+			 */
+			@Override
+			public void sessionActivated(ICoverageSession session) {
+				saveCoverageAsCMAction.setEnabled(true);				
+			}
+	    	
+	    }
 	    /**
 	     * Handles selection changes in the ConcernMapper view.
 	     */
