@@ -36,6 +36,7 @@ http://www.eclipse.org/legal/epl-v10.html
       </view>
       <view
             category="br.ufmg.dcc.tabuleta"
+            icon="icons/sample.gif"
             class="br.ufmg.dcc.tabuleta.views.FeatureSunburstView"
             id="br.ufmg.dcc.tabuleta.sunburst.view"
             name="Sunburst View"

@@ -16,3 +16,5 @@ Require-Bundle: org.eclipse.ui,
  org.jacoco.core;bundle-version="0.5.7"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: lib/prefuse.jar,
+ .
