@@ -14,8 +14,13 @@ package br.ufmg.dcc.tabuleta.views;
 
 import java.util.Random;
 
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
+import org.eclipse.albireo.core.SwingControl;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
@@ -48,16 +53,43 @@ public class FeatureSunburstView extends ViewPart {
 	// The Display
 	private static Display d;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
+	@Override
+	public void createPartControl( final Composite parent) {
+		setUpData();
+		setUpVisualization();
+		setUpRenderers();
+		setUpActions();
+		setUpDisplay();
+		
+		SwingControl swingControl = new SwingControl(parent, SWT.NONE) {
+            protected JComponent createSwingComponent() {
+                return d;
+            }
+
+            public Composite getLayoutAncestor() {
+                return parent;
+            }
+            
+        };
+        vis.run("color");
+		vis.run("layout");
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
-	 * .Composite)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
-	public void createPartControl(Composite parent) {
+	public void setFocus() {
+		// TODO Auto-generated method stub
+	
+	}
 
+	public void method(){
 		setUpData();
 		setUpVisualization();
 		setUpRenderers();
@@ -197,17 +229,6 @@ public class FeatureSunburstView extends ViewPart {
 		d.addControlListener(new PanControl());
 		// Zoom with right-click drag
 		d.addControlListener(new ZoomControl());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
-	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-
 	}
 
 }
