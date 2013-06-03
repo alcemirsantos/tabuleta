@@ -18,6 +18,8 @@ import java.io.StringReader;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -38,6 +40,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import prefuse.data.Edge;
+import prefuse.data.Graph;
+import prefuse.data.Schema;
+import prefuse.data.Table;
+import prefuse.data.io.DataIOException;
+import prefuse.data.io.GraphMLWriter;
 
 import br.ufmg.dcc.tabuleta.actions.CalculateMetricsAction;
 import br.ufmg.dcc.tabuleta.actions.DoIntersectionAction;
@@ -244,4 +253,78 @@ public class CmFilesOperations {
 				message);
 	}
 	
+	/**
+	 * 
+	 * @param cmPath
+	 * @return 
+	 * <p> - a graph generated from the .cm file
+	 * <p> - null if something wrong happens
+	 * @throws Exception 
+	 */
+	public static Graph getCMGraphML(String cmPath ) throws Exception{
+		Graph graph = new Graph();
+		Set<String> concerns = null;
+		
+		String[] files = {cmPath};
+		try {
+			concerns = CmFilesOperations.getCMConcernNames(files);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+		
+		graph.addColumn("id", String.class);
+		graph.addColumn("name", String.class);
+		graph.addColumn("degree", String.class);
+		graph.addColumn("type", String.class);
+
+		String concernName = null;
+	    if(concerns.isEmpty()){
+	    	CmFilesOperations.showMessage("CM File Selection",
+					"You must choose a valid .cm file.");
+			return null;
+		}else{
+			prefuse.data.Node nn = graph.addNode();
+			nn.set("name", "SPL");
+			nn.set("type", "root");
+			nn.set("degree", "100"); 
+			nn.set("id", "");
+			
+			// para cada concern adiciona o concern e seus elementos como edges
+			for (Iterator iterator = concerns.iterator(); iterator.hasNext();) {
+				concernName = (String) iterator.next();
+				
+				prefuse.data.Node n = graph.addNode();
+				n.set("name", concernName);
+				n.set("type", "feature");
+				n.set("degree", "100"); 
+				n.set("id", "");
+				
+				graph.addEdge(nn, n);
+				List<CMElementTag> s = getConcernElements(getDocument(cmPath), concernName);
+				
+				for (CMElementTag elemtent : s) {
+					prefuse.data.Node item = graph.addNode();
+					item.set("name", "");
+					item.set("type", elemtent.getType());
+					item.set("degree", elemtent.getDegree()); 
+					item.set("id", elemtent.getId());
+					
+					graph.addEdge(n, item);
+				}
+			}
+		}
+	    return graph;	    
+	}
+	
+	/**
+	 * writhe the graph to a xml file.
+	 * 
+	 * @param g
+	 * @param filename
+	 * @throws DataIOException
+	 */
+	public static void writeCMGraphMLFile(Graph g, String filename) throws DataIOException{
+		GraphMLWriter writer = new GraphMLWriter();
+		writer.writeGraph(g, filename);		
+	}
 }

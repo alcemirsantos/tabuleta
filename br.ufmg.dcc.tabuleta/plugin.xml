@@ -127,7 +127,17 @@ http://www.eclipse.org/legal/epl-v10.html
                   enablesFor="2"
                   class="br.ufmg.dcc.tabuleta.actions.CalculateMetricsAction">
             </action>
+            <action
+                  id="br.ufmg.dcc.tabuleta.sendToFeatureSunburstView"
+                  label="Send to Feature SunburstView"
+                  icon="icons/sample.gif"
+                  tooltip="iniciate a visualization based on this .cm file."
+                  menubarPath="br.ufmg.dcc.tabuleta.tabuleta.additions.menu/content"
+                  enablesFor="1"
+                  class="br.ufmg.dcc.tabuleta.actions.SendToSunburstViewAction">
+            </action>
       </objectContribution>
+      
    </extension>
    
    <extension
