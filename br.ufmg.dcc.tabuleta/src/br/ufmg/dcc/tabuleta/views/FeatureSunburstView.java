@@ -149,6 +149,7 @@ public class FeatureSunburstView extends ViewPart {
 
 		getSwingControl();
 	}
+	
 
 	protected static SwingControl getSwingControl() {
 		SwingControl swingControl = new SwingControl(myContents, SWT.NONE) {
@@ -197,13 +198,12 @@ public class FeatureSunburstView extends ViewPart {
 			Graph g;
 			try {
 				g = CmFilesOperations.getCMGraphML(selected);
-				CmFilesOperations.writeCMGraphMLFile(g, selected + "CM");
+				GraphManager.getInstance().addGraph(g);
+				CmFilesOperations.writeCMGraphMLFile(g, selected.substring(0, selected.length()-3));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			refresh();
-			showMessage("Select CM action executed");
 		}
 
 		private String[] getDirectoryFiles(String cM_PATH) {

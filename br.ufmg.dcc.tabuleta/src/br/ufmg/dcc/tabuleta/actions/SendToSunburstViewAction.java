@@ -69,7 +69,7 @@ public class SendToSunburstViewAction implements IObjectActionDelegate {
 		Graph g = new Graph();
 		try {
 			g = CmFilesOperations.getCMGraphML(cmFilePath[0]);
-			CmFilesOperations.writeCMGraphMLFile(g, cmFileName[0]);
+			CmFilesOperations.writeCMGraphMLFile(g, cmFileName[0].substring(0, cmFileName[0].length()-3));
 		} catch (Exception e) {
 			// TODO tratar exceção no getDocument()
 			e.printStackTrace();

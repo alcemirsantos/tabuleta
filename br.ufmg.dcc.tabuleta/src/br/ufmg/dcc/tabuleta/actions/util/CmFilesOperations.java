@@ -325,6 +325,6 @@ public class CmFilesOperations {
 	 */
 	public static void writeCMGraphMLFile(Graph g, String filename) throws DataIOException{
 		GraphMLWriter writer = new GraphMLWriter();
-		writer.writeGraph(g, filename);		
+		writer.writeGraph(g, filename+".xml");		
 	}
 }
