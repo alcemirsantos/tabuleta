@@ -14,6 +14,7 @@ package br.ufmg.dcc.tabuleta.views;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.swing.JComponent;
@@ -23,6 +24,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.selectionactions.SelectionHistory;
 import org.eclipse.jface.action.Action;
@@ -49,6 +53,10 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 import org.eclipse.ui.part.ViewPart;
 
+import com.mountainminds.eclemma.core.CoverageTools;
+import com.mountainminds.eclemma.core.ICoverageSession;
+import com.mountainminds.eclemma.core.ScopeUtils;
+
 import prefuse.data.Graph;
 import br.ufmg.dcc.tabuleta.Tabuleta;
 import br.ufmg.dcc.tabuleta.actions.util.CmFilesOperations;
@@ -72,6 +80,7 @@ public class FeatureSunburstView extends ViewPart {
 	private GraphsViewer graphsViewer;
 
 	private Action selectCMAction;
+	private Action updateCMViewWithCoverageSession;
 
 	/*
 	 * (non-Javadoc)
@@ -127,7 +136,9 @@ public class FeatureSunburstView extends ViewPart {
 		selectCMAction.setToolTipText("Select CM action tooltip");
 		selectCMAction.setImageDescriptor(PlatformUI.getWorkbench()
 				.getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+				.getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER));
+		
+		updateCMViewWithCoverageSession = new UpdateViewWithCoverageSessionAction();
 
 	}
 
@@ -210,7 +221,43 @@ public class FeatureSunburstView extends ViewPart {
 			return null;
 		}
 	}
+	/**
+	 * 
+	 */
+	protected class UpdateViewWithCoverageSessionAction extends Action {
+		public void run(){
+			boolean thereIsActiveCoverageSession = false;
+			
+			ICoverageSession activeSession = CoverageTools.getSessionManager().getActiveSession();
+			thereIsActiveCoverageSession = activeSession == null ? false : true;
 
+			HashSet<IPackageFragmentRoot> escopo = null;
+
+			// se existe uma sessão ativa
+			if (thereIsActiveCoverageSession) {
+				try {
+					escopo = (HashSet<IPackageFragmentRoot>) ScopeUtils
+							.filterJREEntries(activeSession.getScope());
+				} catch (JavaModelException e) {
+					e.printStackTrace();
+				}
+				
+				// && e se o elemento está no escopo
+				Iterator<IPackageFragmentRoot> iterator = escopo.iterator();
+
+				// TODO create the graph from the coverage.
+				
+				
+				
+			}else{
+				showMessage("You must run the generated suite test class with EclEmma " +
+						"coverage tool before save the .cm file.");
+			}
+
+		}
+
+	}
+	
 	private class ResourceSelectionHistory extends SelectionHistory {
 		
 		/**
