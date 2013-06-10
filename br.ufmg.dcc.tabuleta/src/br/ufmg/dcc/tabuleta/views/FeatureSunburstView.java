@@ -66,7 +66,7 @@ public class FeatureSunburstView extends ViewPart {
 	private Composite parent;
 	private static Composite myContents;
 
-	private GraphsViewer graphsViewer;
+	private static GraphsViewer graphsViewer;
 
 	private Action selectCMAction;
 	private Action updateViewWithCoverageSession;
@@ -162,14 +162,14 @@ public class FeatureSunburstView extends ViewPart {
 	/**
 	 * @return
 	 */
-	public GraphsViewer getGraphsViewer() {
+	public static GraphsViewer getGraphsViewer() {
 		return graphsViewer;
 	}
 
 	/**
 	 * This viewer helps to update the SunBurst. 
 	 */
-	protected class GraphsViewer {
+	public class GraphsViewer {
 	
 		public void refresh() {
 			refresh();
