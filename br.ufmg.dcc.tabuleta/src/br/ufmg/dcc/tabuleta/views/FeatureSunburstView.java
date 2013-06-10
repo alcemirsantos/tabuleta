@@ -29,15 +29,19 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.part.ViewPart;
 import org.jacoco.core.analysis.ICoverageNode;
 
@@ -70,6 +74,7 @@ public class FeatureSunburstView extends ViewPart {
 
 	private Action selectCMAction;
 	private Action updateViewWithCoverageSession;
+	private Action updateViewWithAPreviousGraph;
 
 	/*
 	 * (non-Javadoc)
@@ -106,13 +111,15 @@ public class FeatureSunburstView extends ViewPart {
 
 	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(selectCMAction);
-		manager.add(updateViewWithCoverageSession);
 		manager.add(new Separator());
+		manager.add(updateViewWithCoverageSession);
+		manager.add(updateViewWithAPreviousGraph);
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(selectCMAction);
 		manager.add(updateViewWithCoverageSession);
+		manager.add(updateViewWithAPreviousGraph);
 	}
 
 	/**
@@ -121,6 +128,7 @@ public class FeatureSunburstView extends ViewPart {
 	private void makeActions() {
 		selectCMAction = new CmFileSelectAction();
 		updateViewWithCoverageSession = new UpdateViewWithCoverageSessionAction();
+		updateViewWithAPreviousGraph = new UptadeViewWithPreviousGraphs();
 	}
 
 	/*
@@ -142,7 +150,7 @@ public class FeatureSunburstView extends ViewPart {
 	protected static SwingControl getSwingControl() {
 		SwingControl swingControl = new SwingControl(myContents, SWT.NONE) {
 			protected JComponent createSwingComponent() {
-				Graph graph = GraphManager.getInstance().getLastGraph();
+				Graph graph = GraphManager.getInstance().getActiveGraph();
 				return StarburstDemo.demo(graph, "name");
 				// return StarburstDemo.demo("/socialnet.xml", "name");
 			}
@@ -181,13 +189,19 @@ public class FeatureSunburstView extends ViewPart {
 	 */
 	protected class CmFileSelectAction extends Action {
 
+		/**
+		 * Constructor
+		 */
 		public CmFileSelectAction() {
 			setText("Select CM");
-			setToolTipText("Select CM action tooltip");
+			setToolTipText("Select CM to update the SunBurst view.");
 			setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 					.getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER));
 		}
 
+		/**
+		 * Exexutes the action
+		 */
 		public void run() {
 			// File standard dialog
 			FileDialog fileDialog = new FileDialog(myContents.getShell());
@@ -223,13 +237,19 @@ public class FeatureSunburstView extends ViewPart {
 	 * This action retrieves the coverage information from Eclemma to build the SunBurst. 
 	 */
 	protected class UpdateViewWithCoverageSessionAction extends Action {
+		/**
+		 * Constructor
+		 */
 		public UpdateViewWithCoverageSessionAction() {
-			setText("update View With Coverage Session");
-			setToolTipText("update View With Coverage Session  tooltip");
+			setText("Update View With Coverage Session");
+			setToolTipText("Update the view with EclEmma Coverage Session information");
 			setImageDescriptor(Tabuleta.imageDescriptorFromPlugin(
 					Tabuleta.ID_PLUGIN, "icons/refresh.gif"));
 		}
 
+		/**
+		 * Executes the action
+		 */
 		public void run() {
 			boolean thereIsActiveCoverageSession = false;
 
@@ -352,5 +372,46 @@ public class FeatureSunburstView extends ViewPart {
 			
 			return child;
 		}
+	}
+	
+	protected class UptadeViewWithPreviousGraphs extends Action{
+		/**
+		 * Constructor 
+		 */
+		public UptadeViewWithPreviousGraphs() {
+			setText("Update View With Previous Graphs");
+			setToolTipText("Select a previous graph to see.");
+			setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+					.getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+		}
+		
+		/**
+		 * Executes the action
+		 */
+		public void run(){
+			CmFilesOperations.showMessage("Previous Graph Update", "Not implemented yet.");
+		}
+		
+		private String showGrahpsList(){
+			ElementListSelectionDialog dialog = 
+					new ElementListSelectionDialog(
+							Display.getCurrent().getActiveShell(),
+							new LabelProvider());
+			String[] graphs = new String[GraphManager.getInstance().getGraphs().size()];
+			int i = 0;
+			for (Graph g : GraphManager.getInstance().getGraphs()){
+				graphs[i] = g.toString(); 
+			}
+			dialog.setElements(graphs);
+			dialog.setTitle("What graph do you want exhibit?");
+			// enquanto o usuário não disser qual é o concern
+			while (dialog.open() != Window.OK){
+				CmFilesOperations.showMessage("Choose a Graph",
+						"You must select a graph you want to exhibit.");
+			}
+			Object[] result = dialog.getResult();
+			return (String)result[0];
+		}
+		
 	}
 }

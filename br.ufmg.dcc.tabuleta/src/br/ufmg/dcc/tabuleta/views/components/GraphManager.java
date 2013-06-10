@@ -29,6 +29,7 @@ public class GraphManager {
 
 	private static GraphManager manager;
 	private Collection<Graph> graphs;
+	private Graph active;
 	
 	private GraphManager(){}
 	public static GraphManager getInstance(){
@@ -47,14 +48,14 @@ public class GraphManager {
 			graphs = new ArrayList<Graph>();
 		}
 		graphs.add(g);
+		active = g;
 		FeatureSunburstView.getGraphsViewer().refresh();
 	}
 	/**
 	 * @return
 	 */
-	public Graph getLastGraph() {
-		ArrayList<Graph> glist = (ArrayList<Graph>) graphs;
-		return glist.get(glist.size()-1);
+	public Graph getActiveGraph() {
+		return active;
 	}
 
 }
