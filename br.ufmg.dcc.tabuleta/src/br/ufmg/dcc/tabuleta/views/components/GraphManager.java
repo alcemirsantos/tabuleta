@@ -12,14 +12,14 @@
  *************************************************************************/
 package br.ufmg.dcc.tabuleta.views.components;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.ForkJoinPool.ManagedBlocker;
-
-import br.ufmg.dcc.tabuleta.views.FeatureSunburstView;
-import br.ufmg.dcc.tabuleta.views.MetricsView;
+import java.util.Date;
+import java.util.HashMap;
 
 import prefuse.data.Graph;
+import br.ufmg.dcc.tabuleta.views.FeatureSunburstView;
 
 /**
  * @author Alcemir R. Santos
@@ -30,6 +30,8 @@ public class GraphManager {
 	private static GraphManager manager;
 	private Collection<Graph> graphs;
 	private Graph active;
+	private HashMap<String, Graph> graphsmap;
+	private String current;
 	
 	private GraphManager(){}
 	public static GraphManager getInstance(){
@@ -40,22 +42,41 @@ public class GraphManager {
 	}
 	
 	public Collection<Graph> getGraphs(){
-		return graphs;
+//		return graphs;
+		return graphsmap.values();
 	}
 
-	public void addGraph(Graph g) {
-		if (graphs == null) {
-			graphs = new ArrayList<Graph>();
-		}
-		graphs.add(g);
-		active = g;
-		FeatureSunburstView.getGraphsViewer().refresh();
+	public Collection<String> getGraphsIDs(){
+		return graphsmap.keySet();
 	}
+	
+	public void addGraph(Graph g) {
+		if(graphsmap == null){
+//		if (graphs == null) {
+//			graphs = new ArrayList<Graph>();
+			graphsmap = new HashMap<String, Graph>();
+		}
+//		graphs.add(g);
+		setActiveGraph((new Timestamp(new Date().getTime())).toString());
+		graphsmap.put(current, g);
+//		active = g;
+	}
+	
+	public String getCurrentGraphTimestamp(){
+		return current;
+	}
+	
 	/**
 	 * @return
 	 */
 	public Graph getActiveGraph() {
-		return active;
+//		return active;
+		return graphsmap.get(current);
+	}
+	
+	public void setActiveGraph(String graphKey){
+		current = graphKey;
+		FeatureSunburstView.getGraphsViewer().update();
 	}
 
 }

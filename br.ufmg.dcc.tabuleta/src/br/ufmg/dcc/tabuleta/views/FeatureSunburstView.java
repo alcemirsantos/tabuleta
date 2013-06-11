@@ -179,7 +179,7 @@ public class FeatureSunburstView extends ViewPart {
 	 */
 	public class GraphsViewer {
 	
-		public void refresh() {
+		public void update() {
 			refresh();
 		}
 	}
@@ -390,6 +390,8 @@ public class FeatureSunburstView extends ViewPart {
 		 */
 		public void run(){
 			CmFilesOperations.showMessage("Previous Graph Update", "Not implemented yet.");
+			String graphChoosed = showGrahpsList();
+			GraphManager.getInstance().setActiveGraph(graphChoosed);
 		}
 		
 		private String showGrahpsList(){
@@ -397,11 +399,7 @@ public class FeatureSunburstView extends ViewPart {
 					new ElementListSelectionDialog(
 							Display.getCurrent().getActiveShell(),
 							new LabelProvider());
-			String[] graphs = new String[GraphManager.getInstance().getGraphs().size()];
-			int i = 0;
-			for (Graph g : GraphManager.getInstance().getGraphs()){
-				graphs[i] = g.toString(); 
-			}
+			String[] graphs = GraphManager.getInstance().getGraphsIDs().toArray(new String[0]);
 			dialog.setElements(graphs);
 			dialog.setTitle("What graph do you want exhibit?");
 			// enquanto o usuário não disser qual é o concern
