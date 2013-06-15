@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import prefuse.data.Graph;
-import br.ufmg.dcc.tabuleta.views.FeatureSunburstView;
+import br.ufmg.dcc.tabuleta.views.SunburstView;
 
 /**
  * @author Alcemir R. Santos
@@ -76,7 +76,7 @@ public class GraphManager {
 	
 	public void setActiveGraph(String graphKey){
 		current = graphKey;
-		FeatureSunburstView.getGraphsViewer().update();
+		SunburstView.getGraphsViewer().update();
 	}
 
 }

@@ -91,7 +91,7 @@ import com.mountainminds.eclemma.core.ScopeUtils;
  * @author Alcemir R. Santos
  * 
  */
-public class FeatureSunburstView extends ViewPart {
+public class SunburstView extends ViewPart {
 
 
 	private Composite parent;
@@ -260,7 +260,7 @@ public class FeatureSunburstView extends ViewPart {
 	}
 	private void showMessage(String message) {
 		MessageDialog.openInformation(myContents.getShell(),
-				"Feature Sunburst View", message);
+				"Sunburst View", message);
 	}
 
 	/**
