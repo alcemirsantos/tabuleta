@@ -12,9 +12,24 @@
  *************************************************************************/
 package br.ufmg.dcc.tabuleta.views;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.util.HashSet;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.eclipse.albireo.core.SwingControl;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -45,12 +60,24 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.part.ViewPart;
 import org.jacoco.core.analysis.ICoverageNode;
 
+import prefuse.Visualization;
+import prefuse.controls.ControlAdapter;
 import prefuse.data.Graph;
 import prefuse.data.Node;
+import prefuse.data.Table;
+import prefuse.data.query.SearchQueryBinding;
+import prefuse.data.search.SearchTupleSet;
+import prefuse.util.FontLib;
+import prefuse.util.ui.JFastLabel;
+import prefuse.util.ui.JSearchPanel;
+import prefuse.util.ui.JValueSlider;
+import prefuse.util.ui.UILib;
+import prefuse.visual.VisualItem;
 import br.ufmg.dcc.tabuleta.Tabuleta;
 import br.ufmg.dcc.tabuleta.actions.util.CmFilesOperations;
 import br.ufmg.dcc.tabuleta.ui.ProblemManager;
 import br.ufmg.dcc.tabuleta.views.components.GraphManager;
+import br.ufmg.dcc.tabuleta.views.components.Starburst;
 import ca.utoronto.cs.prefuseextensions.demo.StarburstDemo;
 
 import com.mountainminds.eclemma.core.CoverageTools;
@@ -144,24 +171,93 @@ public class FeatureSunburstView extends ViewPart {
 			con.dispose();
 		}
 
-		getSwingControl();
+		getSunburstVisualization();
 	}
 
-	protected static SwingControl getSwingControl() {
-		SwingControl swingControl = new SwingControl(myContents, SWT.NONE) {
-			protected JComponent createSwingComponent() {
-				Graph graph = GraphManager.getInstance().getActiveGraph();
-				return StarburstDemo.demo(graph, "name");
-				// return StarburstDemo.demo("/socialnet.xml", "name");
-			}
-
+	protected static SwingControl getSunburstVisualization(){
+		SwingControl sc = new SwingControl(myContents, SWT.NONE) {
+			
+			@Override
 			public Composite getLayoutAncestor() {
 				return myContents;
 			}
-		};
-		return swingControl;
-	}
+			
+			@Override
+			protected JComponent createSwingComponent() {
+				final String label = "name";
+				String treeNodes = "tree.nodes";
+				Graph g = GraphManager.getInstance().getActiveGraph();
+				
+				final Starburst gview = new Starburst(g, label);
+				final Visualization vis = gview.getVisualization();
+				
+				// create a search panel for the tree map
+				SearchQueryBinding sq = new SearchQueryBinding((Table) vis
+						.getGroup(treeNodes), label, (SearchTupleSet) vis
+						.getGroup(Visualization.SEARCH_ITEMS));
+				JSearchPanel search = sq.createSearchPanel();
+				search.setShowResultCount(true);
+				search.setBorder(BorderFactory.createEmptyBorder(5, 5, 4, 0));
+				search.setFont(FontLib.getFont("Tahoma", Font.PLAIN, 11));
 
+				final JFastLabel title = new JFastLabel("                 ");
+				title.setPreferredSize(new Dimension(350, 20));
+				title.setVerticalAlignment(SwingConstants.BOTTOM);
+				title.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
+				title.setFont(FontLib.getFont("Tahoma", Font.PLAIN, 16));
+
+				gview.addControlListener(new ControlAdapter() {
+					public void itemEntered(VisualItem item, MouseEvent e) {
+						if (item.canGetString(label))
+							title.setText(item.getString(label));
+					}
+
+					public void itemExited(VisualItem item, MouseEvent e) {
+						title.setText(null);
+					}
+				});
+
+				JCheckBox resizeCheckBox = new JCheckBox("auto zoom");
+				resizeCheckBox.setBorder(BorderFactory.createEmptyBorder(5,5,4,0));
+				resizeCheckBox.setFont(FontLib.getFont("Tahoma", Font.PLAIN, 12));
+				resizeCheckBox.setSelected(true);
+				resizeCheckBox.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						gview.setAutoResize(((JCheckBox)e.getSource()).isSelected());
+					}
+				});
+				
+				JValueSlider filterLevelSlider = new JValueSlider("Filter level", 1, 20, 1);
+				filterLevelSlider.addChangeListener(new ChangeListener() {
+					public void stateChanged(ChangeEvent e) {
+						gview.setFilterLevel(((JValueSlider)e.getSource()).getValue().intValue());
+					}
+				});
+				
+				Box box = new Box(BoxLayout.X_AXIS);
+				box.add(Box.createHorizontalStrut(10));
+				box.add(title);
+				box.add(Box.createHorizontalGlue());
+				box.add(resizeCheckBox);
+				box.add(Box.createHorizontalStrut(30));
+				box.add(filterLevelSlider);
+				box.add(Box.createHorizontalStrut(30));
+				box.add(search);
+				box.add(Box.createHorizontalStrut(3));
+
+				JPanel panel = new JPanel(new BorderLayout());
+				panel.add(gview, BorderLayout.CENTER);
+				panel.add(box, BorderLayout.SOUTH);
+
+				Color BACKGROUND = Color.WHITE;
+				Color FOREGROUND = Color.DARK_GRAY;
+				UILib.setColor(panel, BACKGROUND, FOREGROUND);
+				
+				return panel;
+			}
+		};
+		return sc;
+	}
 	private void showMessage(String message) {
 		MessageDialog.openInformation(myContents.getShell(),
 				"Feature Sunburst View", message);
@@ -389,7 +485,6 @@ public class FeatureSunburstView extends ViewPart {
 		 * Executes the action
 		 */
 		public void run(){
-			CmFilesOperations.showMessage("Previous Graph Update", "Not implemented yet.");
 			String graphChoosed = showGrahpsList();
 			GraphManager.getInstance().setActiveGraph(graphChoosed);
 		}
@@ -412,4 +507,5 @@ public class FeatureSunburstView extends ViewPart {
 		}
 		
 	}
+	
 }
