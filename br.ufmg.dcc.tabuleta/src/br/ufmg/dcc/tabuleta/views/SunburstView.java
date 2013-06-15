@@ -93,6 +93,10 @@ import com.mountainminds.eclemma.core.ScopeUtils;
  */
 public class SunburstView extends ViewPart {
 
+	/**
+	 * The ID of the view as specified by the extension.
+	 */
+	public static final String ID = "br.ufmg.dcc.tabuleta.views.Sunburst";
 
 	private Composite parent;
 	private static Composite myContents;
