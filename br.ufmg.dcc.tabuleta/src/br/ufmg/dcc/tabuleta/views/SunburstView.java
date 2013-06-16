@@ -509,6 +509,19 @@ public class SunburstView extends ViewPart {
 			
 			return child;
 		}
+		private Node addCoverageNodeToGraph(Graph g, String nodeName, Node parent, String type, Double degree) {
+			
+			Node child = g.addNode();
+			child.set("type", type);
+			child.set("degree", degree);
+			System.out.println("degree of "+nodeName+": "+degree);
+			child.set("name", nodeName);
+			child.set("id", type + nodeName);
+			
+			g.addEdge(parent, child);
+			
+			return child;
+		}
 	}
 	
 	protected class UptadeViewWithPreviousGraphs extends Action{
@@ -540,6 +553,7 @@ public class SunburstView extends ViewPart {
 			dialog.setTitle("What graph do you want exhibit?");
 			// enquanto o usuário não disser qual é o concern
 			while (dialog.open() != Window.OK){
+				// TODO revover loop para o caso de clicar em cancel.
 				CmFilesOperations.showMessage("Choose a Graph",
 						"You must select a graph you want to exhibit.");
 			}

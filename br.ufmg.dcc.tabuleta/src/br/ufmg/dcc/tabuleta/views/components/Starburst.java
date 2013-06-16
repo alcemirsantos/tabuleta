@@ -446,12 +446,12 @@ public class Starburst extends Display {
 			// the root
 			//add("ingroup('_focus_')", ColorLib.rgb(198, 229, 229));
 			
-			add("ingroup('"+Visualization.ALL_ITEMS+"') and ([degree]<20.0)", ColorLib.rgb(152,251,152));
-			add("ingroup('"+Visualization.ALL_ITEMS+"') and ([degree]<40.0)", ColorLib.rgb(144,238,144));
-			add("ingroup('"+Visualization.ALL_ITEMS+"') and ([degree]<60.0)", ColorLib.rgb(50,205,50));
-			add("ingroup('"+Visualization.ALL_ITEMS+"') and ([degree]<80.0)", ColorLib.rgb(60,179,113));
-			add("ingroup('"+Visualization.ALL_ITEMS+"') and ([degree]<95.0)", ColorLib.rgb(34,139,34));
-			add("ingroup('"+Visualization.ALL_ITEMS+"') and ([degree]=100.0)", ColorLib.rgb(0,100,0));			
+			add("([degree]>=0.0 and [degree]<0.20)", ColorLib.rgb(152,251,152));
+			add("([degree]>=0.20 and [degree]<0.40)", ColorLib.rgb(144,238,144));
+			add("([degree]>=0.40 and [degree]<0.60)", ColorLib.rgb(50,205,50));
+			add("([degree]>=0.60 and [degree]<0.80)", ColorLib.rgb(60,179,113));
+			add("([degree]>=0.80 and [degree]<0.95)", ColorLib.rgb(34,139,34));
+			add("([degree]>=0.95 and [degree]<=1.0)", ColorLib.rgb(0,100,0));			
 		}
 	} // end of inner class NodeColorAction
 
