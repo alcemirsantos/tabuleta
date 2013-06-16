@@ -253,7 +253,7 @@ public class Sunburst extends Display {
 		addControlListener(new ZoomToFitControl());
 		addControlListener(new ZoomControl());
 		addControlListener(new PanControl(false));
-		addControlListener(new FocusControl(2, "filter"));
+// this line add a recentering effect on the graph.		addControlListener(new FocusControl(2, "filter"));
 		addControlListener(new FocusControl(Visualization.SELECTED_ITEMS, 1, "filter"));
 		addControlListener(new HoverActionControl("repaint"));
 		addControlListener(new MouseWheelControl("filter", "angleFactor"));
