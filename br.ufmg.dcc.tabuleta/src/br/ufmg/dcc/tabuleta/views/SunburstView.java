@@ -36,7 +36,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.eclipse.albireo.core.SwingControl;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -431,14 +433,30 @@ public class SunburstView extends ViewPart {
 				}
 
 				for (IPackageFragment fragment : fragments) {
+					if (!isSourcePath( fragment.getAncestor(IJavaElement.PACKAGE_FRAGMENT).getPath())) {
+						// avoid to add the test source folder in the graph.
+						break;
+					}
 					try {
+						String lastPackage = "";
 						if (fragment.getKind() == IPackageFragmentRoot.K_SOURCE) {
+							String fragmentName = fragment.getPath().lastSegment();
+							System.out.println(fragmentName);
+							String[] pakkages = fragment.getElementName().split(".");
+							Node pfNode;
 							ICoverageNode node = (ICoverageNode) fragment.getAdapter(ICoverageNode.class);
 							if (node == null) {
+								if (fragmentName.isEmpty()) {
+									pfNode = addCoverageNodeToGraph(g, "<default>", root, "PackageFragment", 0.0);	
+								}else{
+									pfNode = addCoverageNodeToGraph(g, fragmentName, root, "PackageFragment", 0.0);
+								}
+								root = pfNode;										
 								continue;
+							}else{
+								Double ratio = node.getLineCounter().getCoveredRatio();
+								pfNode = addCoverageNodeToGraph(g, fragmentName, root, "PackageFragment", ratio);
 							}
-							Double ratio = node.getLineCounter().getCoveredRatio();
-							Node pfNode = addCoverageNodeToGraph(g, node, root, "PackageFragment", ratio);
 							printICompilationUnitInfo(fragment, g, pfNode);
 						}
 					} catch (JavaModelException e) {
@@ -452,7 +470,18 @@ public class SunburstView extends ViewPart {
 			}
 		}
 
-		
+		/**
+		 * testa se é um pacote de source
+		 * @param aPath
+		 */
+		private boolean isSourcePath(IPath aPath) {
+			for (int i = 0; i < aPath.segments().length; i++) {
+				if (aPath.segment(i).contains("src")) {
+					return true;
+				}
+			}
+			return false;
+		}	
 		private void printICompilationUnitInfo(IPackageFragment mypackage, Graph g, Node root)
 				throws JavaModelException {
 			for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
@@ -501,7 +530,6 @@ public class SunburstView extends ViewPart {
 			Node child = g.addNode();
 			child.set("type", type);
 			child.set("degree", degree);
-			System.out.println("degree of "+node.getName()+": "+degree);
 			child.set("name", node.getName());
 			child.set("id", type + node.getName());
 			
@@ -514,7 +542,6 @@ public class SunburstView extends ViewPart {
 			Node child = g.addNode();
 			child.set("type", type);
 			child.set("degree", degree);
-			System.out.println("degree of "+nodeName+": "+degree);
 			child.set("name", nodeName);
 			child.set("id", type + nodeName);
 			
