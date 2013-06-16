@@ -94,7 +94,7 @@ import ca.utoronto.cs.prefuseextensions.render.SectorRenderer;
  * @author Alcemir R. Santos
  *
  */
-public class Starburst extends Display {
+public class Sunburst extends Display {
 
 	/////////////////////////////
 	///// DATASETS (select one) 
@@ -123,7 +123,7 @@ public class Starburst extends Display {
 	////// CONSTRUCTOR
 	////////////////////////////
 	
-	public Starburst(Graph g, String label) {
+	public Sunburst(Graph g, String label) {
 		super(new Visualization());
 		m_label = label;
 
@@ -248,7 +248,7 @@ public class Starburst extends Display {
 		// ------------------------------------------------
 
 		// initialize the display
-		setSize(600, 550);
+		setSize(800, 550);
 		setItemSorter(new TreeDepthItemSorter());
 		addControlListener(new ZoomToFitControl());
 		addControlListener(new ZoomControl());
@@ -332,7 +332,7 @@ public class Starburst extends Display {
 
 	public static JPanel demo(Graph g, final String label) {
 		// create a new radial tree view
-		final Starburst gview = new Starburst(g, label);
+		final Sunburst gview = new Sunburst(g, label);
 		final Visualization vis = gview.getVisualization();
 		
 		// create a search panel for the tree map
@@ -391,7 +391,7 @@ public class Starburst extends Display {
 
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(gview, BorderLayout.CENTER);
-		panel.add(box, BorderLayout.SOUTH);
+		panel.add(box, BorderLayout.NORTH);
 
 		Color BACKGROUND = Color.WHITE;
 		Color FOREGROUND = Color.DARK_GRAY;

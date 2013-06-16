@@ -84,7 +84,7 @@ import br.ufmg.dcc.tabuleta.actions.SaveAsGraphMLAction;
 import br.ufmg.dcc.tabuleta.actions.util.CmFilesOperations;
 import br.ufmg.dcc.tabuleta.ui.ProblemManager;
 import br.ufmg.dcc.tabuleta.views.components.GraphManager;
-import br.ufmg.dcc.tabuleta.views.components.Starburst;
+import br.ufmg.dcc.tabuleta.views.components.Sunburst;
 import ca.utoronto.cs.prefuseextensions.demo.StarburstDemo;
 
 import com.mountainminds.eclemma.core.CoverageTools;
@@ -205,7 +205,7 @@ public class SunburstView extends ViewPart {
 				String treeNodes = "tree.nodes";
 				Graph g = GraphManager.getInstance().getActiveGraph();
 				
-				final Starburst gview = new Starburst(g, label);
+				final Sunburst gview = new Sunburst(g, label);
 				final Visualization vis = gview.getVisualization();
 				
 				// create a search panel for the tree map
@@ -359,14 +359,12 @@ public class SunburstView extends ViewPart {
 			// Open Dialog and save result of selection
 			String selected = fileDialog.open();
 
-			System.out.println(selected);
+			if (selected==null) return;
 
 			Graph g;
 			try {
 				g = CmFilesOperations.getCMGraphML(selected);
 				GraphManager.getInstance().addGraph(g);
-				CmFilesOperations.writeCMGraphMLFile(g,
-						selected.substring(0, selected.length() - 3));
 			} catch (Exception e) {
 				e.printStackTrace();
 				ProblemManager.reportException(e);
