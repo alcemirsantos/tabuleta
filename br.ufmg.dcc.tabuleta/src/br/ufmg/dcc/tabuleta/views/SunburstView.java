@@ -406,6 +406,8 @@ public class SunburstView extends ViewPart {
 					e.printStackTrace();
 				}
 
+				System.gc();
+				
 				Graph g = new Graph();
 
 				g.addColumn("id", String.class);
