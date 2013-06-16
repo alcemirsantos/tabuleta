@@ -80,6 +80,7 @@ import prefuse.util.ui.JValueSlider;
 import prefuse.util.ui.UILib;
 import prefuse.visual.VisualItem;
 import br.ufmg.dcc.tabuleta.Tabuleta;
+import br.ufmg.dcc.tabuleta.actions.SaveAsGraphMLAction;
 import br.ufmg.dcc.tabuleta.actions.util.CmFilesOperations;
 import br.ufmg.dcc.tabuleta.ui.ProblemManager;
 import br.ufmg.dcc.tabuleta.views.components.GraphManager;
@@ -112,6 +113,8 @@ public class SunburstView extends ViewPart {
 	private Action selectCMAction;
 	private Action updateViewWithCoverageSession;
 	private Action updateViewWithAPreviousGraph;
+
+	private Action saveAsGraphMLAction;
 
 	/*
 	 * (non-Javadoc)
@@ -147,6 +150,8 @@ public class SunburstView extends ViewPart {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
+		manager.add(saveAsGraphMLAction);
+		manager.add(new Separator());
 		manager.add(selectCMAction);
 		manager.add(new Separator());
 		manager.add(updateViewWithCoverageSession);
@@ -154,6 +159,7 @@ public class SunburstView extends ViewPart {
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
+		manager.add(saveAsGraphMLAction);
 		manager.add(selectCMAction);
 		manager.add(updateViewWithCoverageSession);
 		manager.add(updateViewWithAPreviousGraph);
@@ -163,6 +169,7 @@ public class SunburstView extends ViewPart {
 	 * 
 	 */
 	private void makeActions() {
+		saveAsGraphMLAction = new SaveAsGraphMLAction();
 		selectCMAction = new CmFileSelectAction();
 		updateViewWithCoverageSession = new UpdateViewWithCoverageSessionAction();
 		updateViewWithAPreviousGraph = new UptadeViewWithPreviousGraphs();
@@ -569,9 +576,16 @@ public class SunburstView extends ViewPart {
 		 */
 		public void run(){
 			String graphChoosed = showGrahpsList();
-			GraphManager.getInstance().setActiveGraph(graphChoosed);
+			if(graphChoosed==null)
+				return;
+			else
+				GraphManager.getInstance().setActiveGraph(graphChoosed);
 		}
 		
+		/**
+		 * retorna nulo se usuário clicar em cancel, chave para o grafo escolhido caso contrário.
+		 * @return
+		 */
 		private String showGrahpsList(){
 			ElementListSelectionDialog dialog = 
 					new ElementListSelectionDialog(
@@ -580,9 +594,12 @@ public class SunburstView extends ViewPart {
 			String[] graphs = GraphManager.getInstance().getGraphsIDs().toArray(new String[0]);
 			dialog.setElements(graphs);
 			dialog.setTitle("What graph do you want exhibit?");
-			// enquanto o usuário não disser qual é o concern
-			while (dialog.open() != Window.OK){
-				// TODO revover loop para o caso de clicar em cancel.
+
+			dialog.open();
+			if( dialog.getReturnCode() == Window.CANCEL ){
+				return null;
+			}
+			while (dialog.getReturnCode() == Window.OK && dialog.getResult()==null){
 				CmFilesOperations.showMessage("Choose a Graph",
 						"You must select a graph you want to exhibit.");
 			}
