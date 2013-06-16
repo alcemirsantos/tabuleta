@@ -33,6 +33,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import prefuse.Constants;
 import prefuse.Display;
 import prefuse.Visualization;
 import prefuse.action.Action;
@@ -44,6 +45,7 @@ import prefuse.action.animate.ColorAnimator;
 import prefuse.action.animate.QualityControlAnimator;
 import prefuse.action.animate.VisibilityAnimator;
 import prefuse.action.assignment.ColorAction;
+import prefuse.action.assignment.DataColorAction;
 import prefuse.action.assignment.FontAction;
 import prefuse.action.filter.FisheyeTreeFilter;
 import prefuse.action.layout.CollapsedSubtreeLayout;
@@ -170,6 +172,7 @@ public class Starburst extends Display {
 
 		// colors
 		ItemAction nodeColor = new NodeColorAction(treeNodes);
+
 		ColorAction nodeStrokeColor = new ColorAction(treeNodes, VisualItem.STROKECOLOR) {
 			public int getColor(VisualItem item) {
 				return ColorLib.darker(item.getFillColor());
@@ -442,6 +445,13 @@ public class Starburst extends Display {
 			add("ingroup('_search_')", ColorLib.rgb(152, 255, 92));
 			// the root
 			//add("ingroup('_focus_')", ColorLib.rgb(198, 229, 229));
+			
+			add("ingroup('"+Visualization.ALL_ITEMS+"') and ([degree]<20.0)", ColorLib.rgb(152,251,152));
+			add("ingroup('"+Visualization.ALL_ITEMS+"') and ([degree]<40.0)", ColorLib.rgb(144,238,144));
+			add("ingroup('"+Visualization.ALL_ITEMS+"') and ([degree]<60.0)", ColorLib.rgb(50,205,50));
+			add("ingroup('"+Visualization.ALL_ITEMS+"') and ([degree]<80.0)", ColorLib.rgb(60,179,113));
+			add("ingroup('"+Visualization.ALL_ITEMS+"') and ([degree]<95.0)", ColorLib.rgb(34,139,34));
+			add("ingroup('"+Visualization.ALL_ITEMS+"') and ([degree]=100.0)", ColorLib.rgb(0,100,0));			
 		}
 	} // end of inner class NodeColorAction
 

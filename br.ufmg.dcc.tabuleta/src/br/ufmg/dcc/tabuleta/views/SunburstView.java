@@ -18,13 +18,17 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.util.HashSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -125,7 +129,7 @@ public class SunburstView extends ViewPart {
 		myContents.setLayout(gLayout);
 
 		Label lbl = new Label(myContents, SWT.NULL);
-		lbl.setText("Here goes the visualization.");
+		lbl.setText("No graphs to display at this time.");
 
 		makeActions();
 		contributeToActionBars();
@@ -257,8 +261,40 @@ public class SunburstView extends ViewPart {
 				Color FOREGROUND = Color.DARK_GRAY;
 				UILib.setColor(panel, BACKGROUND, FOREGROUND);
 				
+//				addComboBox(panel);
 				return panel;
 			}
+			
+//		    private void addComboBox(JComponent panel) {
+//		        // Many choices, to test what happens when the combobox
+//		    	// does not fit into the AWT part.
+//		    	final String[] comboboxChoices =
+//		    			new String[] {       
+//		    			"Color Option 1",
+//		    			"Color Optiom 2",
+//		    			"Color Option 3",
+//		    			"Color Option 4",
+//		    			"Color Option 5",
+//		    			"Color Option 6",
+//		    	};
+//
+//				final JComboBox combobox1 =
+//		            new JComboBox(comboboxChoices);
+//		        combobox1.addActionListener(
+//		            new ActionListener() {
+//		                public void actionPerformed(ActionEvent event) {
+//		                    System.out.println("combobox1 now selected: "+combobox1.getSelectedItem());
+//		                }
+//		            });
+//		        combobox1.addItemListener(
+//		            new ItemListener() {
+//		                public void itemStateChanged(ItemEvent event) {
+//		                    System.out.println("combobox1 sent "+event);
+//		                }
+//		            });
+//		        panel.add(combobox1,BorderLayout.NORTH);
+//
+//		    }
 		};
 		return sc;
 	}
@@ -372,7 +408,7 @@ public class SunburstView extends ViewPart {
 
 				g.addColumn("id", String.class);
 				g.addColumn("name", String.class);
-				g.addColumn("degree", String.class);
+				g.addColumn("degree", Double.class);
 				g.addColumn("type", String.class);
 
 				Object[] array = escopo.toArray();
@@ -384,7 +420,7 @@ public class SunburstView extends ViewPart {
 				Node root = g.addNode();
 				root.set("name", project.getElementName());
 				root.set("type", "Project");
-				root.set("degree", "100");
+				root.set("degree", 100.0);
 				root.set("id", "project-" + project.getElementName());
 
 				IPackageFragment[] fragments = null;
@@ -401,8 +437,8 @@ public class SunburstView extends ViewPart {
 							if (node == null) {
 								continue;
 							}
-							double ratio = node.getLineCounter().getCoveredRatio();
-							Node pfNode = addCoverageNodeToGraph(g, node, root, "PackageFragment", String.valueOf(ratio));
+							Double ratio = node.getLineCounter().getCoveredRatio();
+							Node pfNode = addCoverageNodeToGraph(g, node, root, "PackageFragment", ratio);
 							printICompilationUnitInfo(fragment, g, pfNode);
 						}
 					} catch (JavaModelException e) {
@@ -432,8 +468,8 @@ public class SunburstView extends ViewPart {
 			if (node == null) {
 				return;
 			}
-			double ratio = node.getLineCounter().getCoveredRatio();
-			Node cuNode = addCoverageNodeToGraph(g, node, root, "CompilationUnit", String.valueOf(ratio));
+			Double ratio = node.getLineCounter().getCoveredRatio();
+			Node cuNode = addCoverageNodeToGraph(g, node, root, "CompilationUnit", ratio);
 			
 			printIMethods(unit,g,cuNode);
 		}
@@ -454,17 +490,18 @@ public class SunburstView extends ViewPart {
 				if (node == null) {
 					continue;
 				}
-				double ratio = node.getLineCounter().getCoveredRatio();			
-				addCoverageNodeToGraph(g, node, root, "Method", String.valueOf(ratio));
+				Double ratio = node.getLineCounter().getCoveredRatio();			
+				addCoverageNodeToGraph(g, node, root, "Method", ratio);
 			}
 		}
 		
 		private Node addCoverageNodeToGraph(Graph g, ICoverageNode node,
-				Node parent, String type, String degree) {
+				Node parent, String type, Double degree) {
 			
 			Node child = g.addNode();
 			child.set("type", type);
 			child.set("degree", degree);
+			System.out.println("degree of "+node.getName()+": "+degree);
 			child.set("name", node.getName());
 			child.set("id", type + node.getName());
 			
