@@ -36,6 +36,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.eclipse.albireo.core.SwingControl;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -45,11 +47,16 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -61,8 +68,11 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ViewPart;
 import org.jacoco.core.analysis.ICoverageNode;
 
@@ -84,6 +94,7 @@ import br.ufmg.dcc.tabuleta.actions.SaveAsGraphMLAction;
 import br.ufmg.dcc.tabuleta.actions.util.CmFilesOperations;
 import br.ufmg.dcc.tabuleta.ui.ProblemManager;
 import br.ufmg.dcc.tabuleta.views.components.GraphManager;
+import br.ufmg.dcc.tabuleta.views.components.JavaElementNode;
 import br.ufmg.dcc.tabuleta.views.components.Sunburst;
 import ca.utoronto.cs.prefuseextensions.demo.StarburstDemo;
 
@@ -116,6 +127,8 @@ public class SunburstView extends ViewPart {
 
 	private Action saveAsGraphMLAction;
 
+	private Action aDoubleClickAction;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -138,6 +151,7 @@ public class SunburstView extends ViewPart {
 
 		makeActions();
 		contributeToActionBars();
+		hookDoubleClickAction();
 	}
 
 	/**
@@ -164,6 +178,18 @@ public class SunburstView extends ViewPart {
 		manager.add(updateViewWithCoverageSession);
 		manager.add(updateViewWithAPreviousGraph);
 	}
+	
+
+	private void hookDoubleClickAction(){
+		graphsViewer.addDoubleClickListener( new IDoubleClickListener() 
+				{
+			public void doubleClick( DoubleClickEvent pEvent) 
+			{
+				aDoubleClickAction.run();
+			}
+				});
+	}
+	
 
 	/**
 	 * 
@@ -173,6 +199,37 @@ public class SunburstView extends ViewPart {
 		selectCMAction = new CmFileSelectAction();
 		updateViewWithCoverageSession = new UpdateViewWithCoverageSessionAction();
 		updateViewWithAPreviousGraph = new UptadeViewWithPreviousGraphs();
+		
+
+	    aDoubleClickAction = new Action() 
+		{
+			public void run() 
+			{
+				ISelection lSelection = graphsViewer.getSelection();
+				Object lObject = ((IStructuredSelection)lSelection).getFirstElement();
+				if( lObject instanceof JavaElementNode )
+				{
+				    IJavaElement lElement = ((JavaElementNode)lObject).getElement();
+				    if( lElement.exists() )
+				    {
+				    	IWorkbenchPage lPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				    	IResource lResource = lElement.getResource();
+				    	if( lResource instanceof IFile )
+				    	{
+				    		try
+				    		{
+				    			JavaUI.revealInEditor( IDE.openEditor( lPage, (IFile)lResource), lElement );
+				    		}
+				    		catch( PartInitException lException )
+				    		{
+				    			ProblemManager.reportException( lException );
+				    		}
+				    	}
+				    }
+				}
+			}
+		};
+
 	}
 
 	/*
@@ -327,6 +384,23 @@ public class SunburstView extends ViewPart {
 		public void update() {
 			refresh();
 		}
+
+		/**
+		 * @param iDoubleClickListener
+		 */
+		public void addDoubleClickListener(
+				IDoubleClickListener iDoubleClickListener) {
+			// TODO develop the listener of the graph viewer
+			
+		}
+
+		/**
+		 * @return
+		 */
+		public ISelection getSelection() {
+			// TODO develop the getselection of the graph viewer.
+			return null;
+		}
 	}
 
 	/**
@@ -415,9 +489,9 @@ public class SunburstView extends ViewPart {
 				
 				Graph g = new Graph();
 
-				g.addColumn("id", String.class);
+				g.addColumn("path", String.class);
 				g.addColumn("name", String.class);
-				g.addColumn("degree", Double.class);
+				g.addColumn("degree", Double.class); // TODO tirar o tipo Double pois ao salvar dá erro no writeGraphML().
 				g.addColumn("type", String.class);
 
 				Object[] array = escopo.toArray();
@@ -430,7 +504,7 @@ public class SunburstView extends ViewPart {
 				root.set("name", project.getElementName());
 				root.set("type", "Project");
 				root.set("degree", 100.0);
-				root.set("id", "project-" + project.getElementName());
+				root.set("path", project.getPath().toString());
 
 				IPackageFragment[] fragments = null;
 				try {
@@ -445,24 +519,21 @@ public class SunburstView extends ViewPart {
 						break;
 					}
 					try {
-						String lastPackage = "";
 						if (fragment.getKind() == IPackageFragmentRoot.K_SOURCE) {
 							String fragmentName = fragment.getPath().lastSegment();
-							System.out.println(fragmentName);
-							String[] pakkages = fragment.getElementName().split(".");
 							Node pfNode;
 							ICoverageNode node = (ICoverageNode) fragment.getAdapter(ICoverageNode.class);
 							if (node == null) {
 								if (fragmentName.isEmpty()) {
-									pfNode = addCoverageNodeToGraph(g, "<default>", root, "PackageFragment", 0.0);	
+									pfNode = addCoverageNodeToGraph(g, "<default>", root, "PackageFragment", 0.0, fragment.getPath().toString());	
 								}else{
-									pfNode = addCoverageNodeToGraph(g, fragmentName, root, "PackageFragment", 0.0);
+									pfNode = addCoverageNodeToGraph(g, fragmentName, root, "PackageFragment", 0.0, fragment.getPath().toString());
 								}
 								root = pfNode;										
 								continue;
 							}else{
 								Double ratio = node.getLineCounter().getCoveredRatio();
-								pfNode = addCoverageNodeToGraph(g, fragmentName, root, "PackageFragment", ratio);
+								pfNode = addCoverageNodeToGraph(g, fragmentName, root, "PackageFragment", ratio, fragment.getPath().toString());
 							}
 							printICompilationUnitInfo(fragment, g, pfNode);
 						}
@@ -505,7 +576,7 @@ public class SunburstView extends ViewPart {
 				return;
 			}
 			Double ratio = node.getLineCounter().getCoveredRatio();
-			Node cuNode = addCoverageNodeToGraph(g, node, root, "CompilationUnit", ratio);
+			Node cuNode = addCoverageNodeToGraph(g, node, root, "CompilationUnit", ratio, unit.getPath().toString());
 			
 			printIMethods(unit,g,cuNode);
 		}
@@ -527,30 +598,30 @@ public class SunburstView extends ViewPart {
 					continue;
 				}
 				Double ratio = node.getLineCounter().getCoveredRatio();			
-				addCoverageNodeToGraph(g, node, root, "Method", ratio);
+				addCoverageNodeToGraph(g, node, root, "Method", ratio, method.getDeclaringType().getPath().toString());
 			}
 		}
 		
 		private Node addCoverageNodeToGraph(Graph g, ICoverageNode node,
-				Node parent, String type, Double degree) {
+				Node parent, String type, Double degree, String path) {
 			
 			Node child = g.addNode();
 			child.set("type", type);
 			child.set("degree", degree);
 			child.set("name", node.getName());
-			child.set("id", type + node.getName());
+			child.set("path", path);
 			
 			g.addEdge(parent, child);
 			
 			return child;
 		}
-		private Node addCoverageNodeToGraph(Graph g, String nodeName, Node parent, String type, Double degree) {
+		private Node addCoverageNodeToGraph(Graph g, String nodeName, Node parent, String type, Double degree, String path) {
 			
 			Node child = g.addNode();
 			child.set("type", type);
 			child.set("degree", degree);
 			child.set("name", nodeName);
-			child.set("id", type + nodeName);
+			child.set("path", path);
 			
 			g.addEdge(parent, child);
 			

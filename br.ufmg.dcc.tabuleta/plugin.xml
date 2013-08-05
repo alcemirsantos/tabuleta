@@ -39,7 +39,7 @@ http://www.eclipse.org/legal/epl-v10.html
             icon="icons/sample.gif"
             class="br.ufmg.dcc.tabuleta.views.SunburstView"
             id="br.ufmg.dcc.tabuleta.views.Sunburst"
-            name="Sunburst View"
+            name="Sunburst"
             restorable="true">
       </view>
    </extension>

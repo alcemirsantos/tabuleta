@@ -33,6 +33,24 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.ui.JavaUI;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
+
+import br.ufmg.dcc.tabuleta.Tabuleta;
+import br.ufmg.dcc.tabuleta.ui.ProblemManager;
+import br.ufmg.dcc.tabuleta.views.SunburstView;
+
 import prefuse.Constants;
 import prefuse.Display;
 import prefuse.Visualization;
@@ -402,6 +420,58 @@ public class Sunburst extends Display {
 
 	// ------------------------------------------------------------------------
 
+	
+	public class OpenJavaEditorAction extends Action{
+
+		public Node getSelectedNode(){
+			return null;
+		}
+		/* (non-Javadoc)
+		 * @see prefuse.action.Action#run(double)
+		 */
+		@Override
+		public void run(double frac) {
+//			ISelection lSelection = SunburstView.getGraphsViewer().getGraphSelection(); // TODO pegar o nó selecionado e transformar numa iselection.
+//			Object lObject = ((IStructuredSelection)lSelection).getFirstElement();
+//			
+//			if( lObject instanceof JavaElementNode )
+//			{
+//			    IJavaElement lElement = ((JavaElementNode)lObject).getElement();
+//			    if( lElement.exists() )
+//			    {
+//			    	IWorkbenchPage lPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+//			    	IResource lResource = lElement.getResource();
+//			    	if( lResource instanceof IFile )
+//			    	{
+//			    		try
+//			    		{
+//			    			JavaUI.revealInEditor( IDE.openEditor( lPage, stringToIPath((String) getSelectedNode().get("path"))), lElement );
+//			    		}
+//			    		catch( PartInitException lException )
+//			    		{
+//			    			ProblemManager.reportException( lException );
+//			    		}
+//			    	}
+//			    }
+//			}
+			
+		}
+		/**		
+		 * @param object
+		 * @return
+		 */
+		private IFile stringToIPath(String strPath) {
+			Path aPath = new Path(strPath);
+			// find file in workspace
+			IFile file= ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(aPath);
+			// check if file in workspace
+			if (file != null ) {
+				return file;
+			} 
+			return null;
+		}
+		
+	}
 	/**
 	 * Switch the root of the tree by requesting a new spanning tree
 	 * at the desired root and hiding all nodes above
@@ -446,12 +516,13 @@ public class Sunburst extends Display {
 			// the root
 			//add("ingroup('_focus_')", ColorLib.rgb(198, 229, 229));
 			
-			add("([degree]>=0.0 and [degree]<0.20)", ColorLib.rgb(152,251,152));
-			add("([degree]>=0.20 and [degree]<0.40)", ColorLib.rgb(144,238,144));
-			add("([degree]>=0.40 and [degree]<0.60)", ColorLib.rgb(50,205,50));
-			add("([degree]>=0.60 and [degree]<0.80)", ColorLib.rgb(60,179,113));
-			add("([degree]>=0.80 and [degree]<0.95)", ColorLib.rgb(34,139,34));
-			add("([degree]>=0.95 and [degree]<=1.0)", ColorLib.rgb(0,100,0));			
+			add("([degree]>=0.0 and [degree]<0.10)", ColorLib.rgb(255,255,255));
+			add("([degree]>=0.10 and [degree]<0.20)", ColorLib.rgb(255,255,102));
+			add("([degree]>=0.20 and [degree]<0.40)", ColorLib.rgb(204,255,0));
+			add("([degree]>=0.40 and [degree]<0.60)", ColorLib.rgb(153,204,0));
+			add("([degree]>=0.60 and [degree]<0.80)", ColorLib.rgb(0,255,0));
+			add("([degree]>=0.80 and [degree]<0.95)", ColorLib.rgb(0,204,0));
+			add("([degree]>=0.95 and [degree]<=1.0)", ColorLib.rgb(0,153,0));			
 		}
 	} // end of inner class NodeColorAction
 
