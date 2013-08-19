@@ -76,7 +76,7 @@ public class GraphManager {
 	
 	public void setActiveGraph(String graphKey){
 		current = graphKey;
-		SunburstView.getGraphsViewer().update();
+		SunburstView.refresh();
 	}
 
 }

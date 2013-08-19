@@ -14,6 +14,7 @@ package br.ufmg.dcc.tabuleta.views;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -22,6 +23,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -38,6 +40,7 @@ import javax.swing.event.ChangeListener;
 import org.eclipse.albireo.core.SwingControl;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -60,6 +63,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -96,7 +100,6 @@ import br.ufmg.dcc.tabuleta.ui.ProblemManager;
 import br.ufmg.dcc.tabuleta.views.components.GraphManager;
 import br.ufmg.dcc.tabuleta.views.components.JavaElementNode;
 import br.ufmg.dcc.tabuleta.views.components.Sunburst;
-import ca.utoronto.cs.prefuseextensions.demo.StarburstDemo;
 
 import com.mountainminds.eclemma.core.CoverageTools;
 import com.mountainminds.eclemma.core.ICoverageSession;
@@ -122,12 +125,14 @@ public class SunburstView extends ViewPart {
 	private static GraphsViewer graphsViewer;
 
 	private Action selectCMAction;
-	private Action updateViewWithCoverageSession;
+	private Action showLineCoverageCodeBurst;
+	private Action showBranchCoverageCodeBurst;
 	private Action updateViewWithAPreviousGraph;
 
 	private Action saveAsGraphMLAction;
 
 	private Action aDoubleClickAction;
+
 
 	/*
 	 * (non-Javadoc)
@@ -168,14 +173,16 @@ public class SunburstView extends ViewPart {
 		manager.add(new Separator());
 		manager.add(selectCMAction);
 		manager.add(new Separator());
-		manager.add(updateViewWithCoverageSession);
+		manager.add(showLineCoverageCodeBurst);
+		manager.add(showBranchCoverageCodeBurst);
 		manager.add(updateViewWithAPreviousGraph);
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(saveAsGraphMLAction);
 		manager.add(selectCMAction);
-		manager.add(updateViewWithCoverageSession);
+		manager.add(showLineCoverageCodeBurst);
+		manager.add(showBranchCoverageCodeBurst);
 		manager.add(updateViewWithAPreviousGraph);
 	}
 	
@@ -185,19 +192,61 @@ public class SunburstView extends ViewPart {
 				{
 			public void doubleClick( DoubleClickEvent pEvent) 
 			{
+//				TODO make this work is also going to open the editor with the selected IFile.
 				aDoubleClickAction.run();
 			}
 				});
 	}
 	
+	/**
+	 * This method is used to open the Editor after a <code>mouseDoubleClick()</code> event.
+	 */
+	private void hookMouse() {
+//		TODO make this work is going to open the editor with the selected IFile.
+//		graphsViewer.getTable().addMouseListener(
+//				new MouseAdapter() {
+//					public void mouseDoubleClick(MouseEvent e) {
+//						openEditor(getSite().getPage(),graphsViewer.getSelection());
+//					}});
+	}
 
+	/**
+	 * Open the Editor itself.
+	 * 
+	 * @param page
+	 * @param selection
+	 */
+	public static void openEditor(IWorkbenchPage page, ISelection selection){
+		// Get the first element.
+		if (!(selection instanceof IStructuredSelection))
+			return;
+		Iterator<?> iter = ((IStructuredSelection) selection).iterator();
+		if (!iter.hasNext())
+			return;
+		Object elem = iter.next();
+		// Adapt the first element to a file.
+		if (!(elem instanceof IAdaptable))
+			return;
+		IFile file = (IFile) ((IAdaptable) elem).getAdapter(IFile.class);
+		if (file == null)
+			return;
+		// Open an editor on that file.
+		try {
+			IDE.openEditor(page, file);
+		}catch (PartInitException e) {
+			ProblemManager.reportException(e);
+			System.err.println("Open editor failed: " + file.toString());
+		}
+	}
 	/**
 	 * 
 	 */
 	private void makeActions() {
 		saveAsGraphMLAction = new SaveAsGraphMLAction();
 		selectCMAction = new CmFileSelectAction();
-		updateViewWithCoverageSession = new UpdateViewWithCoverageSessionAction();
+		showLineCoverageCodeBurst = new UpdateViewWithCoverageSessionAction(1);
+		showBranchCoverageCodeBurst = new UpdateViewWithCoverageSessionAction(2);
+		
 		updateViewWithAPreviousGraph = new UptadeViewWithPreviousGraphs();
 		
 
@@ -364,6 +413,7 @@ public class SunburstView extends ViewPart {
 		};
 		return sc;
 	}
+	
 	private void showMessage(String message) {
 		MessageDialog.openInformation(myContents.getShell(),
 				"Sunburst View", message);
@@ -383,6 +433,14 @@ public class SunburstView extends ViewPart {
 	
 		public void update() {
 			refresh();
+		}
+
+		/**
+		 * @return
+		 */
+		public Component getTable() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 		/**
@@ -419,7 +477,7 @@ public class SunburstView extends ViewPart {
 		}
 
 		/**
-		 * Exexutes the action
+		 * Executes the action
 		 */
 		public void run() {
 			// File standard dialog
@@ -454,16 +512,43 @@ public class SunburstView extends ViewPart {
 	 * This action retrieves the coverage information from Eclemma to build the SunBurst. 
 	 */
 	protected class UpdateViewWithCoverageSessionAction extends Action {
+		int coverageType;
+		
 		/**
 		 * Constructor
 		 */
 		public UpdateViewWithCoverageSessionAction() {
 			setText("Update View With Coverage Session");
+			coverageType = 1; // set line coverage as default;
 			setToolTipText("Update the view with EclEmma Coverage Session information");
 			setImageDescriptor(Tabuleta.imageDescriptorFromPlugin(
 					Tabuleta.ID_PLUGIN, "icons/refresh.gif"));
 		}
 
+		/**
+		 * Constructor<br>
+		 * <p>
+		 * Types: <br> Line coverage: i=1 <br> Branch coverage: i=2 
+		 * @param i: the type of coverage
+		 *  
+		 */
+		public UpdateViewWithCoverageSessionAction(int i) {
+			coverageType = i;
+			switch (coverageType) {
+			case 1:				
+				setText("Show line coverage CodeBurst");				
+				break;
+			case 2:
+				setText("Show branch coverage CodeBurst");
+				break;
+			default:
+				coverageType = 1;
+				break;
+			}
+			setToolTipText("Update the view with EclEmma Coverage Session information");
+			setImageDescriptor(Tabuleta.imageDescriptorFromPlugin(
+					Tabuleta.ID_PLUGIN, "icons/refresh.gif"));
+		}
 		/**
 		 * Executes the action
 		 */
@@ -532,7 +617,7 @@ public class SunburstView extends ViewPart {
 								root = pfNode;										
 								continue;
 							}else{
-								Double ratio = node.getLineCounter().getCoveredRatio();
+								Double ratio = getCoveredRatio(coverageType, node);
 								pfNode = addCoverageNodeToGraph(g, fragmentName, root, "PackageFragment", ratio, fragment.getPath().toString());
 							}
 							printICompilationUnitInfo(fragment, g, pfNode);
@@ -575,7 +660,7 @@ public class SunburstView extends ViewPart {
 			if (node == null) {
 				return;
 			}
-			Double ratio = node.getLineCounter().getCoveredRatio();
+			Double ratio = getCoveredRatio(coverageType, node);
 			Node cuNode = addCoverageNodeToGraph(g, node, root, "CompilationUnit", ratio, unit.getPath().toString());
 			
 			printIMethods(unit,g,cuNode);
@@ -597,11 +682,30 @@ public class SunburstView extends ViewPart {
 				if (node == null) {
 					continue;
 				}
-				Double ratio = node.getLineCounter().getCoveredRatio();			
+				Double ratio = getCoveredRatio(coverageType, node);			
 				addCoverageNodeToGraph(g, node, root, "Method", ratio, method.getDeclaringType().getPath().toString());
 			}
 		}
 		
+		/**
+		 * returns the coverage ratio depending of the type requested.
+		 * <p>
+		 * Types: <br> Line coverage: 1 <br> Branch coverage: 2
+		 * @param type
+		 * @return
+		 */
+		private Double getCoveredRatio(int type, ICoverageNode node){
+			Double ratio = 0.0;
+			switch (type) {
+			case 1: // user choose coverage of lines 
+				return node.getLineCounter().getCoveredRatio();
+			case 2: // user choose coverage of branches
+				return node.getBranchCounter().getCoveredRatio();
+			default:
+				break;
+			}
+			return ratio;
+		}
 		private Node addCoverageNodeToGraph(Graph g, ICoverageNode node,
 				Node parent, String type, Double degree, String path) {
 			

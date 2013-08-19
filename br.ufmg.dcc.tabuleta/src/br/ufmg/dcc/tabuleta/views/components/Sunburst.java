@@ -161,7 +161,7 @@ public class Sunburst extends Display {
 		treeLayout.setAutoScale(false);
 		treeLayout.setLayoutAnchor(new Point2D.Double());
 		// Uncomment next line to restrict graph to semi-circle
-		//treeLayout.setAngularBounds(-Math.PI/2, Math.PI);  // TODO add widget to interactively adjust this
+		//treeLayout.setAngularBounds(-Math.PI/2, Math.PI);  
 		m_vis.putAction("treeLayout", treeLayout);
 
 		// add decorators (has to be after layout because decorators rendered rely on Schema provided by StarburstLayout
@@ -431,6 +431,8 @@ public class Sunburst extends Display {
 		 */
 		@Override
 		public void run(double frac) {
+//			TODO make this work is also going to open the editor with the selected IFile.
+			
 //			ISelection lSelection = SunburstView.getGraphsViewer().getGraphSelection(); // TODO pegar o nó selecionado e transformar numa iselection.
 //			Object lObject = ((IStructuredSelection)lSelection).getFirstElement();
 //			
@@ -504,7 +506,8 @@ public class Sunburst extends Display {
 	 */
 	public static class NodeColorAction extends ColorAction {
 		public NodeColorAction(String group) {
-			super(group, VisualItem.FILLCOLOR,  ColorLib.rgb(61, 130, 246));
+//			super(group, VisualItem.FILLCOLOR,  ColorLib.rgb(61, 130, 246));
+			super(group, VisualItem.FILLCOLOR,  ColorLib.rgb(255, 255, 255));
 			add("_hover and ingroup('"+Visualization.SELECTED_ITEMS+"')",ColorLib.brighter(ColorLib.rgb(0,190,204)));
 			// search results
 			add("_hover and ingroup('_search_')", ColorLib.brighter(ColorLib.rgb(152, 255, 92)));
@@ -518,9 +521,9 @@ public class Sunburst extends Display {
 			
 			add("([degree]>=0.0 and [degree]<0.10)", ColorLib.rgb(255,255,255));
 			add("([degree]>=0.10 and [degree]<0.20)", ColorLib.rgb(255,255,102));
-			add("([degree]>=0.20 and [degree]<0.40)", ColorLib.rgb(204,255,0));
-			add("([degree]>=0.40 and [degree]<0.60)", ColorLib.rgb(153,204,0));
-			add("([degree]>=0.60 and [degree]<0.80)", ColorLib.rgb(0,255,0));
+			add("([degree]>=0.20 and [degree]<0.40)", ColorLib.rgb(215,255,89));
+			add("([degree]>=0.40 and [degree]<0.60)", ColorLib.rgb(154,255,84));
+			add("([degree]>=0.60 and [degree]<0.80)", ColorLib.rgb(106,255,0));
 			add("([degree]>=0.80 and [degree]<0.95)", ColorLib.rgb(0,204,0));
 			add("([degree]>=0.95 and [degree]<=1.0)", ColorLib.rgb(0,153,0));			
 		}

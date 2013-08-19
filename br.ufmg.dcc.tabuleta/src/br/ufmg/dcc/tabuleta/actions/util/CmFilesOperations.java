@@ -274,7 +274,7 @@ public class CmFilesOperations {
 		
 		graph.addColumn("id", String.class);
 		graph.addColumn("name", String.class);
-		graph.addColumn("degree", String.class);
+		graph.addColumn("degree", Double.class); // TODO tirar o tipo Double pois ao salvar dá erro no writeGraphML().
 		graph.addColumn("type", String.class);
 
 		String concernName = null;
@@ -286,7 +286,7 @@ public class CmFilesOperations {
 			prefuse.data.Node nn = graph.addNode();
 			nn.set("name", "SPL");
 			nn.set("type", "root");
-			nn.set("degree", "100"); 
+			nn.set("degree", 0.0); 
 			nn.set("id", "");
 			
 			// para cada concern adiciona o concern e seus elementos como edges
@@ -296,18 +296,18 @@ public class CmFilesOperations {
 				prefuse.data.Node n = graph.addNode();
 				n.set("name", concernName);
 				n.set("type", "feature");
-				n.set("degree", "100"); 
+				n.set("degree", 0.0); 
 				n.set("id", "");
 				
 				graph.addEdge(nn, n);
 				List<CMElementTag> s = getConcernElements(getDocument(cmPath), concernName);
 				
-				for (CMElementTag elemtent : s) {
+				for (CMElementTag element : s) {
 					prefuse.data.Node item = graph.addNode();
-					item.set("name", "");
-					item.set("type", elemtent.getType());
-					item.set("degree", elemtent.getDegree()); 
-					item.set("id", elemtent.getId());
+					item.set("name", "Element "+element.getId());
+					item.set("type", element.getType());
+					item.set("degree", Double.valueOf(element.getDegree())); 
+					item.set("id", element.getId());
 					
 					graph.addEdge(n, item);
 				}

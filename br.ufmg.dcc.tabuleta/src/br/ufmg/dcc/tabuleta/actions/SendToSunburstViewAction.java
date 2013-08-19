@@ -69,7 +69,7 @@ public class SendToSunburstViewAction implements IObjectActionDelegate {
 		Graph g = new Graph();
 		try {
 			g = CmFilesOperations.getCMGraphML(cmFilePath[0]);
-			CmFilesOperations.writeCMGraphMLFile(g, cmFileName[0].substring(0, cmFileName[0].length()-3));
+			//CmFilesOperations.writeCMGraphMLFile(g, cmFileName[0].substring(0, cmFileName[0].length()-3));
 		} catch (Exception e) {
 			// TODO tratar exceção no getDocument()
 			e.printStackTrace();
@@ -94,41 +94,4 @@ public class SendToSunburstViewAction implements IObjectActionDelegate {
 		// TODO Auto-generated method stub
 	}
 	
-//	protected Graph cmGraphMLBuilder(){
-//		String[] cmFilePath = null;
-//		String[] cmFileName = null;
-//		
-//		IStructuredSelection isSelection = null;
-//		if (selection instanceof IStructuredSelection) {
-//			isSelection = (IStructuredSelection) selection;
-//		}
-//		if (isSelection == null){
-//			CmFilesOperations.showMessage("CM File Selection",
-//					"You must choose a .cm file to show in this view.");
-//			return null;
-//		}else if(isSelection.size()>1){
-//			CmFilesOperations.showMessage("CM File Selection",
-//					"You must choose a .cm file to show in this view.");
-//			return null;
-//		}else{
-//			cmFilePath = new String[1];
-//			cmFileName = new String[1];
-//			
-//			Iterator<IResource> srcIterator = isSelection.iterator(); 
-//			if(srcIterator.hasNext()){
-//				IResource file = srcIterator.next();
-//				cmFilePath[0] = file.getLocation().toString();
-//				cmFileName[0] = file.getName();
-//			}
-//		}
-//		Graph g = new Graph();
-//		try {
-//			g = CmFilesOperations.getCMGraphML(cmFilePath[0], cmFileName[0]);
-//		} catch (Exception e) {
-//			// TODO tratar exceção no getDocument()
-//			e.printStackTrace();
-//		}
-//		
-//		return g;		
-//	}
 }
