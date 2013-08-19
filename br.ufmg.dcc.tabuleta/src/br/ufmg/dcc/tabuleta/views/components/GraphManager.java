@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import prefuse.data.Graph;
-import br.ufmg.dcc.tabuleta.views.SunburstView;
+import br.ufmg.dcc.tabuleta.views.CodeBurstView;
 
 /**
  * @author Alcemir R. Santos
@@ -76,7 +76,7 @@ public class GraphManager {
 	
 	public void setActiveGraph(String graphKey){
 		current = graphKey;
-		SunburstView.refresh();
+		CodeBurstView.refresh();
 	}
 
 }

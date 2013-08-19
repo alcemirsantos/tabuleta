@@ -49,7 +49,7 @@ import org.eclipse.ui.ide.IDE;
 
 import br.ufmg.dcc.tabuleta.Tabuleta;
 import br.ufmg.dcc.tabuleta.ui.ProblemManager;
-import br.ufmg.dcc.tabuleta.views.SunburstView;
+import br.ufmg.dcc.tabuleta.views.CodeBurstView;
 
 import prefuse.Constants;
 import prefuse.Display;
