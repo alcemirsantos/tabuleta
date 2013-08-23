@@ -85,7 +85,6 @@ public class TreeMapView extends ViewPart implements
 
 	private int coverageType;
 
-
 	/**
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
@@ -115,7 +114,7 @@ public class TreeMapView extends ViewPart implements
 		treeMap.setColorProvider(new MyColorProvider(Display.getCurrent(), myColors));
 		treeMap.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		treeMap.setTreeMapLayout(new SquarifiedLayout<TreeMapNode>(16));
-		treeMap.setRectangleRenderer(new CushionRectangleRendererEx<TreeMapNode>(1)); // TODO colorir com cobertura
+		treeMap.setRectangleRenderer(new CushionRectangleRendererEx<TreeMapNode>(60)); // TODO colorir com cobertura
 		treeMap.addSelectionChangeListener(this);
 		treeMap.setLabelProvider(this);
 
@@ -233,8 +232,14 @@ public class TreeMapView extends ViewPart implements
 
 	private void printICompilationUnitInfo(IPackageFragment mypackage, TreeMapNode root)
 			throws JavaModelException {
+		TreeMapNode node = new TreeMapNode(
+				mypackage.getElementName(),
+				"Package: "+mypackage.getElementName()+"\n"+
+				"Qtde de Classes: "+mypackage.getCompilationUnits().length,
+				mypackage.getPath().toString());
+		aModel.add(node, 0, root);
 		for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
-			printCompilationUnitDetails(unit, root);
+			printCompilationUnitDetails(unit, node);
 		}
 	}
 
@@ -278,7 +283,8 @@ public class TreeMapView extends ViewPart implements
 			long ratio = getCoveredRatio(cNode);
 			
 			aNode = new TreeMapNode(method.getElementName(),
-					"Class: "+ root.getid()+"\n"+
+//					"Pacote: "+type.getPackageFragment().toString()+
+					"Class: "+ root.getid().substring(0, root.getid().length()-5)+"\n"+
 					"Method: "+ method.getElementName()+"\n"+
 					"Return Type: " + method.getReturnType()+"\n"+
 					"Number of Parameters: " + method.getNumberOfParameters()+"\n"+
@@ -299,7 +305,6 @@ public class TreeMapView extends ViewPart implements
 	private long getCoveredRatio(ICoverageNode node){
 		switch (coverageType) {
 		case 1: // user choose coverage of lines 
-			System.out.println(node.getLineCounter().getCoveredRatio()*100);
 			return (long) (node.getLineCounter().getCoveredRatio()*100);
 		case 2: // user choose coverage of branches
 			return (long) (node.getBranchCounter().getCoveredRatio()*100);
