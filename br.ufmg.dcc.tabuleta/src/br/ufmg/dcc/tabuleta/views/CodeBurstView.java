@@ -148,7 +148,7 @@ public class CodeBurstView extends ViewPart {
 
 		graphsViewer = new GraphsViewer();
 
-		GridLayout gLayout = new GridLayout(1, false);
+		GridLayout gLayout = new GridLayout(1, false); //TODO trocar por FillLayout pra ver se funciona
 		myContents.setLayout(gLayout);
 
 		Label lbl = new Label(myContents, SWT.NULL);
