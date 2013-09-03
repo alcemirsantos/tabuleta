@@ -2,3 +2,4 @@
 bin
 br.ufmg.dcc.tabuleta.site/features/*
 br.ufmg.dcc.tabuleta.site/plugins/*
+*.svn*
