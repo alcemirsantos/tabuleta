@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/64/trunk/TreeMapCore/src/de/engehausen/treemap/impl
+END
+BuildControl.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/!svn/ver/3/trunk/TreeMapCore/src/de/engehausen/treemap/impl/BuildControl.java
+END
+FIFO.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/3/trunk/TreeMapCore/src/de/engehausen/treemap/impl/FIFO.java
+END
+package-info.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/!svn/ver/3/trunk/TreeMapCore/src/de/engehausen/treemap/impl/package-info.java
+END
+RectangleImpl.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/64/trunk/TreeMapCore/src/de/engehausen/treemap/impl/RectangleImpl.java
+END
+RectangleModelImpl.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/!svn/ver/47/trunk/TreeMapCore/src/de/engehausen/treemap/impl/RectangleModelImpl.java
+END
+BorderSquarifiedLayout.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/!svn/ver/47/trunk/TreeMapCore/src/de/engehausen/treemap/impl/BorderSquarifiedLayout.java
+END
+SquarifiedLayout.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/54/trunk/TreeMapCore/src/de/engehausen/treemap/impl/SquarifiedLayout.java
+END
+GenericTreeModel.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/54/trunk/TreeMapCore/src/de/engehausen/treemap/impl/GenericTreeModel.java
+END
